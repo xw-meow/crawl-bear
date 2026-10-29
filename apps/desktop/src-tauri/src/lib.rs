@@ -1,0 +1,83 @@
+mod commands;
+mod core;
+#[cfg(debug_assertions)]
+mod devtest;
+mod crawler;
+mod downloader;
+mod extensions;
+mod session;
+
+use tauri::menu::{MenuBuilder, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder};
+use tauri::{Emitter, Manager};
+
+/// Replace the default File/Edit/View/Window/Help bar with a tiny app menu:
+/// only 设置 and 关于 (plus the standard macOS quit item).
+fn build_app_menu(app: &tauri::AppHandle) -> tauri::Result<()> {
+    let about = MenuItemBuilder::with_id("about", "关于").build(app)?;
+    let settings = MenuItemBuilder::with_id("settings", "设置…").build(app)?;
+    let quit = PredefinedMenuItem::quit(app, Some("退出 CrawlBear"))?;
+
+    let app_menu = SubmenuBuilder::new(app, "CrawlBear")
+        .items(&[&about, &settings])
+        .separator()
+        .item(&quit)
+        .build()?;
+
+    // Native Edit menu: restores Cmd+C/V/A/Z etc. for webview inputs.
+    let undo = PredefinedMenuItem::undo(app, Some("撤销"))?;
+    let redo = PredefinedMenuItem::redo(app, Some("重做"))?;
+    let cut = PredefinedMenuItem::cut(app, Some("剪切"))?;
+    let copy = PredefinedMenuItem::copy(app, Some("复制"))?;
+    let paste = PredefinedMenuItem::paste(app, Some("粘贴"))?;
+    let select_all = PredefinedMenuItem::select_all(app, Some("全选"))?;
+    let edit_menu = SubmenuBuilder::new(app, "编辑")
+        .items(&[&undo, &redo])
+        .separator()
+        .items(&[&cut, &copy, &paste])
+        .separator()
+        .item(&select_all)
+        .build()?;
+
+    let menu = MenuBuilder::new(app)
+        .items(&[&app_menu, &edit_menu])
+        .build()?;
+    app.set_menu(menu)?;
+    Ok(())
+}
+
+pub fn run() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+            let state = core::state::AppState::new(app.handle())?;
+            app.manage(state);
+            build_app_menu(app.handle())?;
+            app.on_menu_event(|app, event| {
+                let id = event.id().0.as_str().to_string();
+                let _ = app.emit("app-menu", id);
+            });
+            #[cfg(debug_assertions)]
+            devtest::maybe_spawn(app.handle().clone());
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            commands::get_settings,
+            commands::save_settings,
+            commands::pick_download_dir,
+            commands::crawl_site,
+            commands::download_media,
+            commands::cancel_download,
+            commands::open_site_login,
+            commands::close_site_login,
+            commands::get_site_session,
+            commands::clear_site_session,
+            commands::reveal_path,
+            commands::open_url,
+            commands::open_video_preview,
+            commands::list_extensions,
+            commands::install_extension,
+            commands::remove_extension,
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running CrawlBear");
+}
