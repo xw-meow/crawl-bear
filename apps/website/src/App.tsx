@@ -240,10 +240,6 @@ export default function App() {
               预览
             </span>
             <h2>点一下，先看再收。</h2>
-            <p>
-              图片直接看大图，视频和音乐可以播放，字体渲染实时样张。
-              确认是你要的那一件，再放进采集袋。
-            </p>
             <ul className="checks">
               <li>
                 <CheckIcon size={15} />
