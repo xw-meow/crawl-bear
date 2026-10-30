@@ -7,8 +7,22 @@ name: Website CI/CD
 
 on:
   pull_request:
+    paths:
+      - "apps/website/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - "scripts/prepare_assets.py"
+      - ".github/workflows/website.yml"
   push:
     branches: [main]
+    paths:
+      - "apps/website/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - "scripts/prepare_assets.py"
+      - ".github/workflows/website.yml"
   workflow_dispatch:
 
 permissions:
