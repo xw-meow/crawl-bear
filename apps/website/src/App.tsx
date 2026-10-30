@@ -143,8 +143,7 @@ export default function App() {
               <span className="mark">收进采集袋。</span>
             </h1>
             <p className="hero__lede">
-              输入一个网址，图片、视频、音乐、字体一次翻出来。
-              只读翻找，本机保存，不经过任何云端。
+              输入一个网址，把图片、视频、音乐、字体全部分类找出来。
             </p>
             <div className="hero__actions">
               <a className="btn btn--primary" href={RELEASES} target="_blank" rel="noreferrer">
@@ -156,7 +155,6 @@ export default function App() {
                 查看源码
               </a>
             </div>
-            <p className="hero__meta">免费 · 无需账号 · 无遥测 · 基于 Tauri 2</p>
           </motion.div>
 
           <motion.div
@@ -189,7 +187,6 @@ export default function App() {
               能做什么
             </span>
             <h2>一次翻遍网页里的媒体</h2>
-            <p>不用装浏览器插件，不用复制开发者工具里的长链接。</p>
           </div>
 
           <div className="features">
