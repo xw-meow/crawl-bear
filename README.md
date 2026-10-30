@@ -123,6 +123,17 @@ pnpm package:macos
 
 没有 Apple Developer 账号时，用户首次打开会触发 Gatekeeper。请把 [docs/INSTALL-macOS.md](docs/INSTALL-macOS.md) 一起发给对方，按里面的右键打开或终端命令处理；不要全局关闭 Gatekeeper。
 
+### 官网自动部署（腾讯云 COS）
+
+官网使用 `.github/workflows/website.yml`，在 `main` push / PR 时构建，并可在 `main` 上部署到腾讯云 COS。
+
+仓库 Settings → Secrets and variables → Actions 配置：
+
+- Variables：`COS_BUCKET`、`COS_REGION`、`COS_PREFIX`
+- Secrets：`COS_SECRET_ID`、`COS_SECRET_KEY`
+
+未配置 Variables 时只构建、不部署。`COS_PREFIX` 会同时作为 Vite `base` 使用，例如 `crawl-bear` 会生成 `/crawl-bear/` 的资源路径，并上传到 COS 的 `crawl-bear/` 目录。
+
 ### GitHub Actions 发布流水线
 
 - `.github/workflows/ci.yml`：`main` push / PR 时构建两个前端包并跑 Rust 测试；

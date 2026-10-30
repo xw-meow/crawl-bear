@@ -78,10 +78,13 @@ const STEPS = [
   },
 ];
 
+const asset = (path: string) =>
+  `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
+
 const SHOTS = [
-  { id: "home", label: "首页", src: "/assets/shots/home.webp", caption: "一个输入框，一屏就够" },
-  { id: "results", label: "结果页", src: "/assets/shots/results.webp", caption: "分类筛选，勾选后批量收袋" },
-  { id: "settings", label: "设置", src: "/assets/shots/settings.webp", caption: "保存位置、扩展、并发与登录站点" },
+  { id: "home", label: "首页", src: asset("/assets/shots/home.webp"), caption: "一个输入框，一屏就够" },
+  { id: "results", label: "结果页", src: asset("/assets/shots/results.webp"), caption: "分类筛选，勾选后批量收袋" },
+  { id: "settings", label: "设置", src: asset("/assets/shots/settings.webp"), caption: "保存位置、扩展、并发与登录站点" },
 ];
 
 const TECH = [
@@ -105,7 +108,7 @@ export default function App() {
 
       <header className="nav">
         <a className="nav__brand" href="#top" aria-label="超级爬爬熊 CrawlBear 首页">
-          <img src="/assets/brand/bear-logo.webp" alt="" />
+          <img src={asset("/assets/brand/bear-logo.webp")} alt="" />
           <span>
             <strong>超级爬爬熊</strong>
             <em>CrawlBear</em>
@@ -166,8 +169,8 @@ export default function App() {
             <span className="hero__blob" aria-hidden="true" />
             <SmartImage
               className="hero__bear"
-              primary="/assets/generated/hero.png"
-              fallback="/assets/brand/bear-hero.webp"
+              primary={asset("/assets/generated/hero.png")}
+              fallback={asset("/assets/brand/bear-hero.webp")}
               alt="小熊爬爬抱着采集袋挥手"
             />
             <span className="sticker sticker--jpg">JPG</span>
@@ -222,8 +225,8 @@ export default function App() {
             transition={{ duration: 0.4 }}
           >
             <SmartImage
-              primary="/assets/generated/preview.png"
-              fallback="/assets/brand/bear-happy.webp"
+              primary={asset("/assets/generated/preview.png")}
+              fallback={asset("/assets/brand/bear-happy.webp")}
               alt="小熊抱着装满媒体文件的采集袋"
             />
             <span className="split__tag">先看，再收</span>
@@ -266,8 +269,8 @@ export default function App() {
             transition={{ duration: 0.4 }}
           >
             <SmartImage
-              primary="/assets/generated/resolver.png"
-              fallback="/assets/brand/bear-crawl.webp"
+              primary={asset("/assets/generated/resolver.png")}
+              fallback={asset("/assets/brand/bear-crawl.webp")}
               alt="小熊拿着放大镜和工具，正在调校一枚媒体解析齿轮"
             />
             <span className="split__tag">最高清晰度</span>
@@ -458,8 +461,8 @@ export default function App() {
             </div>
             <div className="install__art">
               <SmartImage
-                primary="/assets/generated/install.png"
-                fallback="/assets/brand/bear-login.webp"
+                primary={asset("/assets/generated/install.png")}
+                fallback={asset("/assets/brand/bear-login.webp")}
                 alt="小熊抱着安装包裹，旁边是盾牌和门"
               />
               <span className="split__tag">本机优先</span>
@@ -469,7 +472,7 @@ export default function App() {
 
         <section className="download" id="download">
           <div className="download__card">
-            <img className="download__logo" src="/assets/brand/bear-logo.webp" alt="" />
+            <img className="download__logo" src={asset("/assets/brand/bear-logo.webp")} alt="" />
             <div>
               <span className="eyebrow">
                 <DownloadIcon size={12} />
@@ -501,7 +504,7 @@ export default function App() {
 
       <footer className="footer">
         <div className="footer__brand">
-          <img src="/assets/brand/bear-logo.webp" alt="" />
+          <img src={asset("/assets/brand/bear-logo.webp")} alt="" />
           <div>
             <strong>超级爬爬熊 · CrawlBear</strong>
             <p>只读翻找，本机保存。</p>
