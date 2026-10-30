@@ -412,7 +412,7 @@ export default function App() {
               <h2>第一次打开，按这三步来。</h2>
               <p className="install__lede">
                 我们没有预算购买 Apple Developer Program（$99/年），所以安装包没有做
-                Apple 公证。macOS 首次打开会拦一下，这不是文件损坏。
+                Apple 公证。macOS 首次打开会拦一下。
               </p>
               <ol className="install__steps">
                 <li>
