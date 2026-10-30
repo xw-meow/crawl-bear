@@ -134,6 +134,8 @@ pnpm package:macos
 
 未配置 Variables 时只构建、不部署。`COS_PREFIX` 会同时作为 Vite `base` 使用，例如 `crawl-bear` 会生成 `/crawl-bear/` 的资源路径，并上传到 COS 的 `crawl-bear/` 目录。
 
+`COS_SECRET_ID` / `COS_SECRET_KEY` 可以配置在组织级；请确认该组织 Secret 的 Repository access 已包含本仓库。
+
 ### GitHub Actions 发布流水线
 
 - `.github/workflows/ci.yml`：`main` push / PR 时构建两个前端包并跑 Rust 测试；
