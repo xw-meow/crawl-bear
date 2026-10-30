@@ -11,6 +11,8 @@
 <img alt="只读 · 本机" src="https://img.shields.io/badge/%E5%8F%AA%E8%AF%BB-%E6%9C%AC%E6%9C%BA-5E9C68?style=flat-square&labelColor=FFF7E8" />
 <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-33261D?style=flat-square&labelColor=FFF7E8" />
 
+**官网：** [https://we.miework.cn/crawl-bear/index.html](https://we.miework.cn/crawl-bear/index.html)
+
 </div>
 
 ## 这是什么
@@ -24,7 +26,7 @@
 | 包 | 说明 |
 | --- | --- |
 | `apps/desktop` | macOS 桌面应用（Tauri 2 + Rust + React） |
-| `apps/website` | 官网（Vite + React + TypeScript） |
+| `apps/website` | 官网（Vite + React + TypeScript），已部署到 [we.miework.cn/crawl-bear](https://we.miework.cn/crawl-bear/index.html) |
 
 ## 特性
 

@@ -2,6 +2,8 @@
 
 CrawlBear 的官方介绍页，使用 **Vite + React + TypeScript + framer-motion** 构建，与桌面应用共用同一套手绘贴纸视觉。
 
+**线上地址：** [https://we.miework.cn/crawl-bear/index.html](https://we.miework.cn/crawl-bear/index.html)
+
 ## 开发
 
 在仓库根目录：
