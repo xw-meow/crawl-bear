@@ -284,11 +284,6 @@ export default function App() {
               专属解析
             </span>
             <h2>难啃的站点，交给专属解析。</h2>
-            <p>
-              X / Twitter、YouTube 等站点已经接上专属 resolver：
-              自动找到最高清晰度的轨道，优先保存完整音视频，结果页会亮起
-              「专属解析已启用」。
-            </p>
             <ul className="checks">
               <li>
                 <CheckIcon size={15} />
