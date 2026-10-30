@@ -389,10 +389,6 @@ export default function App() {
                 <br />
                 不是网页套壳。
               </h2>
-              <p>
-                Tauri 2 把系统 WebView 和 Rust 后端装进一个轻量窗口：
-                页面在隐藏窗口里只读加载，提取与下载都走本机，Cookie、设置和文件都不会离开你的电脑。
-              </p>
               <a className="btn btn--light" href={`${REPO}/tree/main/docs`} target="_blank" rel="noreferrer">
                 阅读架构文档
                 <ArrowRightIcon size={16} />
