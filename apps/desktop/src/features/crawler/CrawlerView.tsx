@@ -21,6 +21,7 @@ import {
   normalizeHttpUrl,
 } from "../../shared/format";
 import { Mascot, type MascotMood } from "../../shared/components/Mascot";
+import { t } from "../../shared/i18n";
 import { ArrowLeftIcon, SparkIcon } from "../../shared/components/Icons";
 import { CrawlForm } from "./components/CrawlForm";
 import { CrawlProgressPanel } from "./components/CrawlProgressPanel";
@@ -182,19 +183,19 @@ export function CrawlerView({
     visibleResources.some((resource) => selected.has(resource.id));
 
   const mascotMood: MascotMood = crawling ? "crawl" : "hero";
-  const bubbleLine = crawling ? "我这就去翻…" : "今天想翻哪个网站？";
+  const bubbleLine = crawling ? t("我这就去翻…", "Let me take a look…") : t("今天想翻哪个网站？", "Which site should I crawl today?");
 
   const handleCrawl = async () => {
     if (crawling) return;
     const normalized = normalizeHttpUrl(url.trim()) ?? normalizeHttpUrl(extractUrl(url.trim()));
     if (!normalized) {
-      message.error("这个网址打不开，换一个试试。");
+      message.error(t("这个网址打不开，换一个试试。", "This URL cannot be opened. Try another one."));
       return;
     }
 
     message.destroy();
     setCrawling(true);
-    setCrawlProgress({ stage: "loading", message: "正在打开页面…", percent: 0 });
+    setCrawlProgress({ stage: "loading", message: t("正在打开页面…", "Opening page…"), percent: 0 });
     setSummary(null);
     setDownloadProgress(null);
     setStatuses({});
@@ -211,12 +212,12 @@ export function CrawlerView({
       setResult(next);
       setActiveKinds(defaultKindSet(settings));
       setPage("results");
-      setCrawlProgress({ stage: "done", message: "翻找完成。", percent: 100 });
+      setCrawlProgress({ stage: "done", message: t("翻找完成。", "Crawl complete."), percent: 100 });
       window.setTimeout(() => setCrawlProgress(null), 500);
       if (next.needs_login) {
-        message.warning("这页要登录，去设置里登录一下。");
+        message.warning(t("这页要登录，去设置里登录一下。", "This page requires login. Sign in from Settings."));
       } else if (next.resources.length === 0) {
-        message.info("这页没翻到东西。");
+        message.info(t("这页没翻到东西。", "Nothing was found on this page."));
       }
     } catch (error) {
       const info = toAppError(error);
@@ -275,11 +276,11 @@ export function CrawlerView({
       setStatuses(statusesFromSummary(next));
       setSelected(new Set(next.failures.map((failure) => failure.id)));
       if (next.canceled) {
-        message.info("下载已取消。");
+        message.info(t("下载已取消。", "Download canceled."));
       } else if (next.failed_count > 0) {
-        message.warning(`收好了 ${next.success_count} 件，${next.failed_count} 件没收到。`);
+        message.warning(t(`收好了 ${next.success_count} 件，${next.failed_count} 件没收到。`, `Saved ${next.success_count}, ${next.failed_count} failed.`));
       } else {
-        message.success(`收好了，${next.success_count} 件都在袋子里。`);
+        message.success(t(`收好了，${next.success_count} 件都在袋子里。`, `Saved ${next.success_count} items to your collection.`));
       }
     } catch (error) {
       message.error(toAppError(error).message);
@@ -294,7 +295,7 @@ export function CrawlerView({
     setCanceling(true);
     try {
       await api.cancelDownload();
-      message.info("剩下的先不收了。");
+      message.info(t("剩下的先不收了。", "Cancel remaining downloads."));
     } catch (error) {
       message.error(toAppError(error).message);
     } finally {
@@ -332,11 +333,11 @@ export function CrawlerView({
             <header className="hero">
               <div className="hero__copy">
                 <h1>
-                  把网页里的宝贝，
+                  {t("把网页里的宝贝，", "All the treasures on the web,")}
                   <br />
-                  <span className="accent">收进采集袋。</span>
+                  <span className="accent">{t("收进采集袋。", "into your collection bag.")}</span>
                 </h1>
-                <p className="hero__sub">图片、视频、音乐、字体，一次翻出来。</p>
+                <p className="hero__sub">{t("图片、视频、音乐、字体，一次翻出来。", "Images, videos, music and fonts — all in one pass.")}</p>
               </div>
 
               <motion.div
@@ -396,37 +397,37 @@ export function CrawlerView({
                   className="rb-back"
                   onClick={backHome}
                   disabled={downloading}
-                  title={downloading ? "下载完成后可以返回" : "回到首页"}
+                  title={downloading ? t("下载完成后可以返回", "You can go back after downloads finish") : t("回到首页", "Back to home")}
                 >
                   <ArrowLeftIcon size={16} />
-                  再翻一页
+                  {t("再翻一页", "Crawl another page")}
                 </button>
-                {settingsLoading && <span className="results-topbar__hint">读取设置…</span>}
+                {settingsLoading && <span className="results-topbar__hint">{t("读取设置…", "Loading settings…")}</span>}
               </div>
 
               {result && (
                 <>
                   <div className="result-head">
                     <div className="result-head__copy">
-                      <h2>{result.title || result.host || "未命名页面"}</h2>
+                      <h2>{result.title || result.host || t("未命名页面", "Untitled page")}</h2>
                       {result.enhanced && (
                         <span
                           className="result-badge"
-                          title="已启用站点专属解析：优先提取原始高清晰度资源。"
+                          title={t("已启用站点专属解析：优先提取原始高清晰度资源。", "Site-specific parsing is enabled: original high-quality assets are preferred.")}
                         >
                           <SparkIcon size={13} />
-                          专属解析已启用
+                          {t("专属解析已启用", "Site parsing enabled")}
                         </span>
                       )}
                     </div>
                     <div className="result-head__stats">
                       <span className="result-count">
                         <strong>{result.resources.length}</strong>
-                        <span>件宝贝</span>
+                        <span>{t("件宝贝", "items")}</span>
                       </span>
                       {result.warnings.length > 0 && (
                         <details className="warnings">
-                          <summary>{result.warnings.length} 条提示</summary>
+                          <summary>{t(`${result.warnings.length} 条提示`, `${result.warnings.length} notices`)}</summary>
                           <ul>
                             {result.warnings.map((warning) => (
                               <li key={warning}>{warning}</li>
@@ -443,15 +444,15 @@ export function CrawlerView({
                         <Mascot mood="login" size={168} still />
                       </div>
                       <div className="login-required__body">
-                        <h3>这页要登录</h3>
-                        <p>去设置里登录 {result.host}，我再来翻。</p>
+                        <h3>{t("这页要登录", "This page requires login")}</h3>
+                        <p>{t("去设置里登录", "Sign in to")} {result.host} {t("，我再来翻。", "from Settings, then crawl again.")}</p>
                         <div className="login-required__actions">
                           <Button
                             type="primary"
                             className="rb-btn rb-btn--primary"
                             onClick={() => onOpenSettings(result.final_url || result.page_url)}
                           >
-                            去登录
+                            {t("去登录", "Sign in")}
                           </Button>
                           <Button
                             className="rb-btn rb-btn--ghost"
@@ -460,7 +461,7 @@ export function CrawlerView({
                               window.setTimeout(() => void handleCrawl(), 160);
                             }}
                           >
-                            再试一次
+                            {t("再试一次", "Try again")}
                           </Button>
                         </div>
                       </div>
@@ -477,7 +478,7 @@ export function CrawlerView({
                             disabled={visibleResources.length === 0}
                             onChange={toggleAllVisible}
                           >
-                            全选当前（{visibleResources.length}）
+                            {t(`全选当前（${visibleResources.length}）`, `Select all visible (${visibleResources.length})`)}
                           </Checkbox>
                           {selected.size > 0 && (
                             <button
@@ -485,7 +486,7 @@ export function CrawlerView({
                               className="rb-text-link"
                               onClick={() => setSelected(new Set())}
                             >
-                              清空
+                              {t("清空", "Clear")}
                             </button>
                           )}
                         </div>
@@ -495,21 +496,21 @@ export function CrawlerView({
                         <div className="result-empty">
                           <Mascot mood="empty" size={172} still />
                           <div>
-                            <h3>这页没翻到东西</h3>
-                            <p>换一页，或去设置里登录后再试。</p>
+                            <h3>{t("这页没翻到东西", "Nothing found on this page")}</h3>
+                            <p>{t("换一页，或去设置里登录后再试。", "Try another page, or sign in from Settings first.")}</p>
                           </div>
                         </div>
                       ) : visibleResources.length === 0 ? (
                         <div className="result-empty">
                           <Mascot mood="empty" size={172} still />
                           <div>
-                            <h3>这一栏是空的</h3>
+                            <h3>{t("这一栏是空的", "This filter is empty")}</h3>
                             <button
                               type="button"
                               className="rb-text-link"
                               onClick={() => setActiveKinds(new Set(MEDIA_KINDS))}
                             >
-                              显示全部类型
+                              {t("显示全部类型", "Show all types")}
                             </button>
                           </div>
                         </div>

@@ -5,6 +5,7 @@ import { listen } from "@tauri-apps/api/event";
 import { api, type AppSettings } from "../shared/api";
 import { toAppError, type AppError } from "../shared/errors";
 import { Masthead, type AppView } from "./Masthead";
+import { detectLocale, resolveLocale, setLocale, t } from "../shared/i18n";
 import { CrawlerView } from "../features/crawler/CrawlerView";
 import { SettingsView } from "../features/settings/SettingsView";
 
@@ -20,12 +21,23 @@ export default function App() {
   const [prefillUrl, setPrefillUrl] = useState("");
   const [settingsWarm, setSettingsWarm] = useState(false);
 
+  const locale = settings ? resolveLocale(settings.language) : detectLocale();
+  setLocale(locale);
+
+  useEffect(() => {
+    document.documentElement.lang = locale === "en" ? "en" : "zh-CN";
+    if (!inTauriApp) return;
+    void api.setAppLanguage(locale).catch(() => {
+      /* menu update is best-effort */
+    });
+  }, [inTauriApp, locale]);
+
   const loadSettings = useCallback(async () => {
     if (!inTauriApp) {
       setSettingsLoading(false);
       setSettingsError({
         code: "not_tauri",
-        message: "当前在浏览器中预览，桌面能力不可用。",
+        message: t("当前在浏览器中预览，桌面能力不可用。", "Desktop features are unavailable in the browser preview."),
       });
       return;
     }
@@ -36,7 +48,7 @@ export default function App() {
       setSettingsError(null);
     } catch (error) {
       setSettingsError(toAppError(error));
-      message.error("读取设置失败，请重试。");
+      message.error(t("读取设置失败，请重试。", "Could not load settings. Please try again."));
     } finally {
       setSettingsLoading(false);
     }
@@ -56,17 +68,24 @@ export default function App() {
 
   const showAbout = useCallback(() => {
     modal.info({
-      title: "关于超级爬爬熊",
+      title: t("关于超级爬爬熊", "About CrawlBear"),
       centered: true,
-      okText: "知道了",
+      okText: t("知道了", "Got it"),
       className: "about-modal",
       content: (
         <div className="about-modal__body">
-          <p className="about-modal__name">超级爬爬熊 · CrawlBear</p>
-          <p>一款开源的网页媒体翻找小工具，只在你的电脑上只读工作。</p>
+          <p className="about-modal__name">{t("超级爬爬熊 · CrawlBear", "CrawlBear")}</p>
           <p>
-            我们鼓励把它用于学习与个人素材整理，不提倡、也不鼓励用于任何不当用途。
-            请遵守目标网站的服务条款与著作权法律，只保存你有权使用的内容。
+            {t(
+              "一款开源的网页媒体翻找小工具，只在你的电脑上只读工作。",
+              "An open-source media crawler that only reads pages locally on your Mac.",
+            )}
+          </p>
+          <p>
+            {t(
+              "我们鼓励把它用于学习与个人素材整理，不提倡、也不鼓励用于任何不当用途。请遵守目标网站的服务条款与著作权法律，只保存你有权使用的内容。",
+              "Use it for learning and organizing your own media. Respect each site's terms and copyright; save only content you are allowed to use.",
+            )}
           </p>
           <p className="about-modal__version">v0.3.2</p>
         </div>
@@ -111,7 +130,7 @@ export default function App() {
   const handleSaved = (next: AppSettings) => {
     setSettings(next);
     setSettingsError(null);
-    message.success("设置已保存。");
+    message.success(t("设置已保存。", "Settings saved."));
   };
 
   const navigate = (next: AppView) => {
@@ -126,7 +145,7 @@ export default function App() {
     <div className="rb-app">
       <div className="paper-dots" aria-hidden="true" />
       <a className="skip-link" href="#main">
-        跳到主要内容
+        {t("跳到主要内容", "Skip to main content")}
       </a>
 
       <Masthead view={view} onNavigate={navigate} />

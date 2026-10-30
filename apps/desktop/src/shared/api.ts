@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { t } from "./i18n";
 
 /* ---------------- Domain types (mirror docs/API_CONTRACT.md) ---------------- */
 
@@ -60,6 +61,7 @@ export interface AppSettings {
   scroll_page: boolean;
   max_items: number;
   sites: LoginSite[];
+  language: "auto" | "zh" | "en";
 }
 
 export interface DownloadFile {
@@ -177,14 +179,17 @@ function normalizeError(error: unknown): CrawlBearError {
 
   if (typeof error === "string") {
     const trimmed = error.trim();
-    if (!trimmed) return new CrawlBearError("unknown", "发生未知错误，请稍后重试。");
+    if (!trimmed) return new CrawlBearError("unknown", t("发生未知错误，请稍后重试。", "Something went wrong. Please try again."));
     try {
       return normalizeError(JSON.parse(trimmed));
     } catch {
       if (trimmed.includes("__TAURI_INTERNALS__")) {
         return new CrawlBearError(
           "not_tauri",
-          "当前在浏览器中预览，桌面能力不可用。请用 npm run tauri dev 启动应用。"
+          t(
+            "当前在浏览器中预览，桌面能力不可用。请用 npm run tauri dev 启动应用。",
+            "Desktop features are unavailable in the browser preview. Start the app with pnpm dev:desktop.",
+          )
         );
       }
       return new CrawlBearError("unknown", trimmed);
@@ -205,13 +210,16 @@ function normalizeError(error: unknown): CrawlBearError {
     if (error.message.includes("__TAURI_INTERNALS__")) {
       return new CrawlBearError(
         "not_tauri",
-        "当前在浏览器中预览，桌面能力不可用。请用 npm run tauri dev 启动应用。"
+        t(
+          "当前在浏览器中预览，桌面能力不可用。请用 npm run tauri dev 启动应用。",
+          "Desktop features are unavailable in the browser preview. Start the app with pnpm dev:desktop.",
+        )
       );
     }
     return new CrawlBearError("unknown", error.message);
   }
 
-  return new CrawlBearError("unknown", "发生未知错误，请稍后重试。");
+  return new CrawlBearError("unknown", t("发生未知错误，请稍后重试。", "Something went wrong. Please try again."));
 }
 
 async function call<T>(command: string, args?: Record<string, unknown>): Promise<T> {
@@ -252,4 +260,7 @@ export const api = {
     call<ExtensionStatus>("install_extension", { id }),
   removeExtension: (id: string) =>
     call<ExtensionStatus[]>("remove_extension", { id }),
+
+  setAppLanguage: (language: "zh" | "en") =>
+    call<null>("set_app_language", { language }),
 };

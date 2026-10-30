@@ -13,6 +13,7 @@ import {
   FolderIcon,
   kindIcon,
 } from "../../../shared/components/Icons";
+import { t } from "../../../shared/i18n";
 
 interface DownloadBarProps {
   selected: MediaResource[];
@@ -66,7 +67,7 @@ export function DownloadBar({
     <motion.div
       className="download-bar"
       role="region"
-      aria-label="批量下载"
+      aria-label={t("批量下载", "Batch download")}
       initial={reduceMotion ? false : { y: 90, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={reduceMotion ? { opacity: 0 } : { y: 90, opacity: 0 }}
@@ -87,7 +88,7 @@ export function DownloadBar({
 
         <div className="download-bar__main">
           <p className="download-bar__title">
-            已选 <strong>{count}</strong> 件
+            {t("已选", "Selected")} <strong>{count}</strong> {t("件", "items")}
             {parts.length > 0 && (
               <span className="download-bar__kinds">
                 {parts.map(({ kind, count: kindCount }) => {
@@ -107,7 +108,7 @@ export function DownloadBar({
               progress ? (
                 <>
                   <span className="download-bar__current">
-                    {progress.current_name || "正在准备…"}
+                    {progress.current_name || t("正在准备…", "Preparing…")}
                   </span>
                   <span>
                     {progress.current_total
@@ -117,20 +118,20 @@ export function DownloadBar({
                   </span>
                 </>
               ) : (
-                "正在准备下载…"
+                t("正在准备下载…", "Preparing download…")
               )
             ) : summary ? (
               <span>
-                {summary.canceled ? "已取消" : "收好了"}
-                {` · 成功 ${summary.success_count} 件`}
-                {summary.failed_count > 0 ? ` · 失败 ${summary.failed_count} 件` : ""}
+                {summary.canceled ? t("已取消", "Canceled") : t("收好了", "Saved")}
+                {` · ${t("成功", "success")} ${summary.success_count}`}
+                {summary.failed_count > 0 ? ` · ${t("失败", "failed")} ${summary.failed_count}` : ""}
                 <span className="download-bar__folder" title={summary.folder}>
                   {" "}
                   → {folder}
                 </span>
               </span>
             ) : (
-              <span title={folder}>收进 {folder}</span>
+              <span title={folder}>{t("收进", "Save to")} {folder}</span>
             )}
           </p>
         </div>
@@ -150,7 +151,7 @@ export function DownloadBar({
                   loading={canceling}
                   disabled={canceling}
                 >
-                  {canceling ? "正在取消…" : "先不收了"}
+                  {canceling ? t("正在取消…", "Canceling…") : t("先不收了", "Cancel")}
                 </Button>
               </motion.span>
             )}
@@ -165,7 +166,7 @@ export function DownloadBar({
                   icon={<FolderIcon size={15} />}
                   onClick={() => onReveal(summary.folder)}
                 >
-                  在 Finder 中显示
+                  {t("在 Finder 中显示", "Show in Finder")}
                 </Button>
               </motion.span>
             )}
@@ -178,7 +179,7 @@ export function DownloadBar({
               loading={downloading}
               disabled={count === 0}
             >
-              {downloading ? "正在收…" : "收进采集袋"}
+              {downloading ? t("正在收…", "Saving…") : t("收进采集袋", "Collect")}
               {!downloading && <DownloadIcon size={17} />}
             </Button>
           </motion.div>
@@ -193,7 +194,7 @@ export function DownloadBar({
 
       {summary && !downloading && summary.failures.length > 0 && (
         <details className="download-bar__failures">
-          <summary>有 {summary.failed_count} 件没收到，看看原因</summary>
+          <summary>{t(`有 ${summary.failed_count} 件没收到，看看原因`, `${summary.failed_count} items failed — see why`)}</summary>
           <ul>
             {summary.failures.map((failure) => (
               <li key={failure.id}>

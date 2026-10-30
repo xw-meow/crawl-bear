@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { PawIcon, SlidersIcon } from "../shared/components/Icons";
+import { t } from "../shared/i18n";
 
 export type AppView = "crawler" | "settings";
 
@@ -47,7 +48,7 @@ export function Masthead({ view, onNavigate }: MastheadProps) {
           type="button"
           className="brand"
           onClick={() => onNavigate("crawler")}
-          aria-label="超级爬爬熊 CrawlBear，回到首页"
+          aria-label={t("超级爬爬熊 CrawlBear，回到首页", "CrawlBear — back to home")}
         >
           <span className="brand__mark" aria-hidden="true">
             {logoFailed ? (
@@ -57,12 +58,12 @@ export function Masthead({ view, onNavigate }: MastheadProps) {
             )}
           </span>
           <span className="brand__text">
-            <strong>超级爬爬熊</strong>
+            <strong>{t("超级爬爬熊", "CrawlBear")}</strong>
             <span className="brand__en">CrawlBear</span>
           </span>
         </button>
 
-        <nav className="main-nav" aria-label="主导航">
+        <nav className="main-nav" aria-label={t("主导航", "Main navigation")}>
           <button
             type="button"
             className="main-nav__item"
@@ -70,7 +71,7 @@ export function Masthead({ view, onNavigate }: MastheadProps) {
             onClick={() => onNavigate("crawler")}
           >
             <PawIcon size={15} />
-            翻找
+            {t("翻找", "Crawl")}
           </button>
           <button
             type="button"
@@ -79,7 +80,7 @@ export function Masthead({ view, onNavigate }: MastheadProps) {
             onClick={() => onNavigate("settings")}
           >
             <SlidersIcon size={15} />
-            设置
+            {t("设置", "Settings")}
           </button>
         </nav>
       </div>

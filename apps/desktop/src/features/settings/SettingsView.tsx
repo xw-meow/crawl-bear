@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { App as AntApp, Button, Input, InputNumber, Slider, Switch } from "antd";
+import { App as AntApp, Button, Input, InputNumber, Segmented, Slider, Switch } from "antd";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   api,
@@ -15,6 +15,7 @@ import {
   PawIcon,
 } from "../../shared/components/Icons";
 import { LoginSites } from "./components/LoginSites";
+import { t } from "../../shared/i18n";
 import { ExtensionsPanel } from "./components/ExtensionsPanel";
 
 interface SettingsViewProps {
@@ -91,7 +92,7 @@ export function SettingsView({
       const dir = await api.pickDownloadDir();
       if (dir) {
         update({ download_dir: dir });
-        message.success("选好了，保存后生效。");
+        message.success(t("选好了，保存后生效。", "Selected. It takes effect after saving."));
       }
     } catch (pickerError) {
       message.error(toAppError(pickerError).message);
@@ -112,11 +113,11 @@ export function SettingsView({
   const handleSave = async () => {
     if (!draft || saving) return;
     if (draft.default_kinds.length === 0) {
-      message.error("至少留一种类型，不然每次翻找都是空的。");
+      message.error(t("至少留一种类型，不然每次翻找都是空的。", "Keep at least one media type selected."));
       return;
     }
     if (!inTauriApp) {
-      message.error("浏览器预览模式无法保存设置。");
+      message.error(t("浏览器预览模式无法保存设置。", "Settings cannot be saved in the browser preview."));
       return;
     }
 
@@ -141,10 +142,10 @@ export function SettingsView({
       <section className="settings-view">
         <div className="settings-scroll">
           <header className="settings-head">
-            <h1>设置</h1>
+            <h1>{t("设置", "Settings")}</h1>
           </header>
           <div className="panel settings-loading" role="status" aria-live="polite">
-            正在读取本机设置…
+            {t("正在读取本机设置…", "Loading local settings…")}
           </div>
         </div>
       </section>
@@ -156,12 +157,12 @@ export function SettingsView({
       <section className="settings-view">
         <div className="settings-scroll">
           <header className="settings-head">
-            <h1>设置</h1>
+            <h1>{t("设置", "Settings")}</h1>
           </header>
           <div className="panel settings-loading">
-            <p>{error?.message || "设置读取失败。"}</p>
+            <p>{error?.message || t("设置读取失败。", "Could not load settings.")}</p>
             <button type="button" className="rb-text-link" onClick={onRefresh}>
-              重新读取
+              {t("重新读取", "Reload")}
             </button>
           </div>
         </div>
@@ -184,11 +185,11 @@ export function SettingsView({
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: "spring", stiffness: 240, damping: 24 }}
         >
-          设置
+          {t("设置", "Settings")}
         </motion.h1>
         <div className="settings-head__status">
           <span className="settings-head__status-dot" data-dirty={dirty || undefined} />
-          {dirty ? "有改动没保存" : "都存好了"}
+          {dirty ? t("有改动没保存", "Unsaved changes") : t("都存好了", "All saved")}
         </div>
       </header>
 
@@ -200,7 +201,7 @@ export function SettingsView({
             {...sectionMotion(0)}
           >
             <div className="panel__head">
-              <h2 id="folderTitle">保存位置</h2>
+              <h2 id="folderTitle">{t("保存位置", "Download folder")}</h2>
             </div>
             <div className="folder-field">
               <span className="folder-field__icon" aria-hidden="true">
@@ -215,13 +216,13 @@ export function SettingsView({
                   loading={picking}
                   onClick={() => void handlePickFolder()}
                 >
-                  换一个
+                  {t("换一个", "Change")}
                 </Button>
                 <Button
                   className="rb-btn rb-btn--text rb-btn--sm"
                   onClick={() => void handleOpenFolder()}
                 >
-                  打开
+                  {t("打开", "Open")}
                 </Button>
               </div>
             </div>
@@ -237,14 +238,14 @@ export function SettingsView({
             {...sectionMotion(2)}
           >
             <div className="panel__head">
-              <h2 id="defaultsTitle">翻找默认值</h2>
+              <h2 id="defaultsTitle">{t("翻找默认值", "Crawl defaults")}</h2>
             </div>
 
             <div className="setting-block">
               <div className="setting-block__label">
-                <span>默认类型</span>
+                <span>{t("默认类型", "Default types")}</span>
               </div>
-              <div className="kind-picker" role="group" aria-label="默认采集类型">
+              <div className="kind-picker" role="group" aria-label={t("默认采集类型", "Default media types")}>
                 {MEDIA_KINDS.map((kind) => {
                   const Icon = kindIcon(kind);
                   const checked = draft.default_kinds.includes(kind);
@@ -264,13 +265,13 @@ export function SettingsView({
                 })}
               </div>
               {draft.default_kinds.length === 0 && (
-                <p className="setting-block__error">至少留一种默认类型。</p>
+                <p className="setting-block__error">{t("至少留一种默认类型。", "Keep at least one default type.")}</p>
               )}
             </div>
 
             <div className="setting-block setting-block--row">
               <div className="setting-block__label">
-                <span>同时下载</span>
+                <span>{t("同时下载", "Concurrent downloads")}</span>
               </div>
               <div className="slider-field">
                 <Slider
@@ -280,7 +281,7 @@ export function SettingsView({
                   value={draft.concurrency}
                   onChange={(value) => update({ concurrency: Number(value) })}
                   tooltip={{ formatter: null }}
-                  aria-label="并发下载数"
+                  aria-label={t("并发下载数", "Concurrent download count")}
                 />
                 <span className="slider-field__value">{draft.concurrency}</span>
               </div>
@@ -288,18 +289,18 @@ export function SettingsView({
 
             <div className="setting-block setting-block--row">
               <div className="setting-block__label">
-                <span>自动滚动</span>
+                <span>{t("自动滚动", "Auto scroll")}</span>
               </div>
               <Switch
                 checked={draft.scroll_page}
                 onChange={(checked) => update({ scroll_page: checked })}
-                aria-label="自动滚动加载"
+                aria-label={t("自动滚动加载", "Auto scroll to load content")}
               />
             </div>
 
             <div className="setting-block setting-block--row setting-block--last">
               <div className="setting-block__label">
-                <span>单次最多</span>
+                <span>{t("单次最多", "Max items per crawl")}</span>
               </div>
               <div className="number-field">
                 <InputNumber
@@ -311,16 +312,40 @@ export function SettingsView({
                   onChange={(value) => {
                     if (typeof value === "number") update({ max_items: value });
                   }}
-                  aria-label="单次最多采集数量"
+                  aria-label={t("单次最多采集数量", "Maximum items per crawl")}
                 />
-                <span className="number-field__suffix">件</span>
+                <span className="number-field__suffix">{t("件", "items")}</span>
               </div>
             </div>
           </motion.section>
         </div>
 
         <div className="settings-col">
-          <motion.div {...sectionMotion(2)}>
+          <motion.section
+            className="panel settings-card"
+            aria-labelledby="languageTitle"
+            {...sectionMotion(2)}
+          >
+            <div className="panel__head">
+              <h2 id="languageTitle">{t("语言", "Language")}</h2>
+            </div>
+            <div className="setting-block setting-block--row setting-block--last">
+              <div className="setting-block__label">
+                <span>{t("界面语言", "Interface language")}</span>
+              </div>
+              <Segmented
+                value={draft.language}
+                onChange={(value) => update({ language: value as "auto" | "zh" | "en" })}
+                options={[
+                  { label: t("跟随系统", "System"), value: "auto" },
+                  { label: "中文", value: "zh" },
+                  { label: "English", value: "en" },
+                ]}
+              />
+            </div>
+          </motion.section>
+
+          <motion.div {...sectionMotion(3)}>
             <LoginSites
               sites={draft.sites}
               active={active}
@@ -333,26 +358,28 @@ export function SettingsView({
           <motion.section
             className="panel settings-card about-card"
             aria-labelledby="aboutTitle"
-            {...sectionMotion(3)}
+            {...sectionMotion(4)}
           >
             <div className="panel__head">
-              <h2 id="aboutTitle">关于</h2>
+              <h2 id="aboutTitle">{t("关于", "About")}</h2>
             </div>
             <div className="about-brand">
               <span className="about-brand__mark" aria-hidden="true">
                 <PawIcon size={24} />
               </span>
               <div>
-                <p className="about-brand__name">超级爬爬熊 · CrawlBear</p>
+                <p className="about-brand__name">{t("超级爬爬熊 · CrawlBear", "CrawlBear")}</p>
                 <p className="about-brand__version">v0.3.2</p>
               </div>
             </div>
             <p className="about-copy">
-              超级爬爬熊是一款开源学习小工具，只读翻找公开页面，不提倡也不鼓励用于任何不当用途。
-              请遵守目标网站的服务条款与著作权法律，只保存你有权使用的内容。
+              {t(
+                "超级爬爬熊是一款开源学习小工具，只读翻找公开页面，不提倡也不鼓励用于任何不当用途。请遵守目标网站的服务条款与著作权法律，只保存你有权使用的内容。",
+                "CrawlBear is an open-source learning tool that only reads public pages. Use it responsibly, follow each site's terms and copyright law, and save only content you are allowed to use.",
+              )}
             </p>
             <button type="button" className="rb-text-link about-refresh" onClick={onRefresh}>
-              重新读取设置
+              {t("重新读取设置", "Reload settings")}
             </button>
           </motion.section>
         </div>
@@ -361,7 +388,7 @@ export function SettingsView({
 
       <div className="settings-savebar">
         <div className="settings-savebar__status">
-          <p>{dirty ? "改完记得保存。" : "都存好了。"}</p>
+          <p>{dirty ? t("改完记得保存。", "Remember to save your changes.") : t("都存好了。", "Everything is saved.")}</p>
         </div>
         <div className="settings-savebar__actions">
           {dirty && (
@@ -370,7 +397,7 @@ export function SettingsView({
               className="rb-text-link"
               onClick={() => setDraft(settings ? cloneSettings(settings) : null)}
             >
-              放弃改动
+              {t("放弃改动", "Discard changes")}
             </button>
           )}
           <Button
@@ -380,7 +407,7 @@ export function SettingsView({
             disabled={!dirty || saving}
             onClick={() => void handleSave()}
           >
-            保存设置
+            {t("保存设置", "Save settings")}
             {!saving && <ArrowRightIcon size={15} />}
           </Button>
         </div>

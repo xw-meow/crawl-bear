@@ -1,10 +1,11 @@
 import { motion, useReducedMotion } from "framer-motion";
 import type { CrawlProgress } from "../../../shared/api";
+import { getLocale, t } from "../../../shared/i18n";
 
 const STAGE_LABELS: Record<string, string> = {
-  loading: "正在打开页面",
-  extracting: "正在翻找资源",
-  done: "翻找完成",
+  get loading() { return t("正在打开页面", "Opening page"); },
+  get extracting() { return t("正在翻找资源", "Finding media"); },
+  get done() { return t("翻找完成", "Crawl complete"); },
 };
 
 interface CrawlProgressPanelProps {
@@ -19,9 +20,11 @@ export function CrawlProgressPanel({ progress }: CrawlProgressPanelProps) {
   return (
     <div className="crawl-progress" role="status" aria-live="polite">
       <div className="crawl-progress__head">
-        <span className="crawl-progress__stage">{STAGE_LABELS[stage] ?? "翻找中"}</span>
+        <span className="crawl-progress__stage">{STAGE_LABELS[stage] ?? t("翻找中", "Crawling")}</span>
         <span className="crawl-progress__message">
-          {progress?.message || "正在打开页面并扫描媒体资源…"}
+          {getLocale() === "en"
+            ? t("正在打开页面并扫描媒体资源…", "Opening the page and scanning for media…")
+            : progress?.message || t("正在打开页面并扫描媒体资源…", "Opening the page and scanning for media…")}
         </span>
       </div>
 

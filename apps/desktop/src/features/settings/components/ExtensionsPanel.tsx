@@ -8,6 +8,7 @@ import {
 } from "../../../shared/api";
 import { toAppError } from "../../../shared/errors";
 import { formatSize } from "../../../shared/format";
+import { t } from "../../../shared/i18n";
 
 interface ExtensionsPanelProps {
   active: boolean;
@@ -56,14 +57,14 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
 
   const install = async (extension: ExtensionStatus) => {
     if (!inTauriApp) {
-      message.error("浏览器预览模式无法安装扩展。");
+      message.error(t("浏览器预览模式无法安装扩展。", "Extensions cannot be installed in the browser preview."));
       return;
     }
     setInstalling(extension.id);
     setProgress(null);
     try {
       await api.installExtension(extension.id);
-      message.success(`${extension.name} 装好了。`);
+      message.success(t(`${extension.name} 装好了。`, `${extension.name} installed.`));
       setExtensions((await api.listExtensions()) ?? []);
     } catch (error) {
       message.error(toAppError(error).message);
@@ -75,15 +76,15 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
 
   const remove = (extension: ExtensionStatus) => {
     modal.confirm({
-      title: `移除 ${extension.name}？`,
-      content: "移除后，依赖它的下载（如 YouTube 音视频合并、HLS）会暂时不可用。",
-      okText: "移除",
-      cancelText: "先留着",
+      title: t(`移除 ${extension.name}？`, `Remove ${extension.name}?`),
+      content: t("移除后，依赖它的下载（如 YouTube 音视频合并、HLS）会暂时不可用。", "Downloads that depend on it (YouTube muxing, HLS) will be unavailable until reinstalled."),
+      okText: t("移除", "Remove"),
+      cancelText: t("先留着", "Keep"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
           setExtensions((await api.removeExtension(extension.id)) ?? []);
-          message.success(`${extension.name} 已移除。`);
+          message.success(t(`${extension.name} 已移除。`, `${extension.name} removed.`));
         } catch (error) {
           message.error(toAppError(error).message);
           throw error;
@@ -99,7 +100,7 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
   return (
     <section className="panel settings-card extensions-card" aria-labelledby="extensionsTitle">
       <div className="panel__head">
-        <h2 id="extensionsTitle">扩展</h2>
+        <h2 id="extensionsTitle">{t("扩展", "Extensions")}</h2>
       </div>
 
       {extensions.map((extension) => {
@@ -116,10 +117,14 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
                     className="extension-row__state"
                     data-installed={extension.installed || undefined}
                   >
-                    {extension.installed ? "已安装" : "未安装"}
+                    {extension.installed ? t("已安装", "Installed") : t("未安装", "Not installed")}
                   </span>
                 </p>
-                <p className="extension-row__desc">{extension.description}</p>
+                <p className="extension-row__desc">
+                  {extension.id === "ffmpeg"
+                    ? t(extension.description, "Video muxing and HLS downloads.")
+                    : extension.description}
+                </p>
               </div>
               <div className="extension-row__actions">
                 {extension.installed ? (
@@ -132,13 +137,13 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
                       disabled={busy}
                       onClick={() => remove(extension)}
                     >
-                      移除
+                      {t("移除", "Remove")}
                     </Button>
                   </>
                 ) : (
                   <>
                     <span className="extension-row__meta">
-                      下载约 {formatSize(extension.download_size)}
+                      {t("下载约", "Download")} {formatSize(extension.download_size)}
                     </span>
                     <Button
                       type="primary"
@@ -147,7 +152,7 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
                       disabled={!extension.can_install || !inTauriApp}
                       onClick={() => void install(extension)}
                     >
-                      下载安装
+                      {t("下载安装", "Install")}
                     </Button>
                   </>
                 )}
@@ -164,12 +169,12 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
                 />
                 <span>
                   {stage === "installing" || stage === "done"
-                    ? "正在解压并校验…"
+                    ? t("正在解压并校验…", "Extracting and verifying…")
                     : progress
                       ? `${formatSize(progress.received)} / ${
                           progress.total ? formatSize(progress.total) : "…"
                         }`
-                      : "正在连接…"}
+                      : t("正在连接…", "Connecting…")}
                 </span>
               </div>
             )}
@@ -179,7 +184,9 @@ export function ExtensionsPanel({ active, inTauriApp }: ExtensionsPanelProps) {
 
       {!loading && extensions.length === 0 && (
         <p className="extension-row__desc">
-          {inTauriApp ? "正在读取扩展列表…" : "浏览器预览模式下不显示扩展。"}
+          {inTauriApp
+            ? t("正在读取扩展列表…", "Loading extensions…")
+            : t("浏览器预览模式下不显示扩展。", "Extensions are hidden in the browser preview.")}
         </p>
       )}
     </section>

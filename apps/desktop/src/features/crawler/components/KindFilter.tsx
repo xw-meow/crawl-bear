@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import type { MediaKind } from "../../../shared/api";
 import { KIND_LABELS, MEDIA_KINDS } from "../../../shared/format";
 import { kindIcon } from "../../../shared/components/Icons";
+import { t } from "../../../shared/i18n";
 
 interface KindFilterProps {
   counts: Record<MediaKind, number>;
@@ -14,7 +15,7 @@ export function KindFilter({ counts, active, onChange }: KindFilterProps) {
   const allActive = active.size === MEDIA_KINDS.length;
 
   return (
-    <div className="kind-filter" role="group" aria-label="按资源类型筛选">
+    <div className="kind-filter" role="group" aria-label={t("按资源类型筛选", "Filter by media type")}>
       <motion.button
         type="button"
         className="kind-chip"
@@ -24,7 +25,7 @@ export function KindFilter({ counts, active, onChange }: KindFilterProps) {
         whileTap={{ scale: 0.94 }}
         onClick={() => onChange(new Set(MEDIA_KINDS))}
       >
-        <span className="kind-chip__label">全部</span>
+        <span className="kind-chip__label">{t("全部", "All")}</span>
         <span className="kind-chip__count">{total}</span>
       </motion.button>
       {MEDIA_KINDS.map((kind) => {

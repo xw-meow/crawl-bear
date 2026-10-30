@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { t } from "../i18n";
 import type { CSSProperties } from "react";
 
 export type MascotMood =
@@ -319,7 +320,7 @@ function BearSvg({ mood }: { mood: MascotMood }) {
       className="mascot__svg"
       viewBox="0 0 320 320"
       role="img"
-      aria-label="爬爬熊"
+      aria-label={t("爬爬熊", "Papa the bear")}
     >
       {/* ground shadow */}
       <ellipse cx="160" cy="288" rx="92" ry="14" fill={INK} opacity="0.1" />

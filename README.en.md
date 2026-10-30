@@ -41,6 +41,7 @@ The repository is a **pnpm workspace**:
 - **Controlled downloads**: group files by site domain; concurrency 1–5; cancellable; HLS/DASH is remuxed to MP4 with the in-app FFmpeg extension; every item reports success or failure.
 - **Native feel**: fixed top bar, single-screen home, dedicated results page, minimal macOS menu (About / Settings / Quit) plus a native Edit menu; context menu and text selection are disabled.
 - **Hand-drawn bear**: “Papa” the bear accompanies the crawl with sticker-style visuals and light framer-motion animations that respect reduced motion.
+- **Chinese / English UI**: follows the system language by default, with a manual switch in Settings. The website auto-detects the browser language and has a language switch in the nav.
 
 ## Screenshots
 
@@ -178,6 +179,7 @@ Add a site URL in **Settings → Login sites**, click “Open login” and sign 
 | Auto scroll | Scroll the page first to trigger lazy loading, then extract |
 | Max items | Upper limit for one crawl, 50–2000 |
 | Login sites | Sites whose content requires login |
+| Language | System / 中文 / English |
 
 ## Project structure
 

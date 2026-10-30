@@ -4,6 +4,7 @@ import {
   CloseIcon,
   GlobeIcon,
 } from "../../../shared/components/Icons";
+import { t } from "../../../shared/i18n";
 
 interface CrawlFormProps {
   url: string;
@@ -25,13 +26,16 @@ export function CrawlForm({ url, crawling, onUrlChange, onCrawl }: CrawlFormProp
         <GlobeIcon size={20} />
       </span>
       <label className="visually-hidden" htmlFor="crawlUrl">
-        网页地址
+        {t("网页地址", "Page URL")}
       </label>
       <input
         id="crawlUrl"
         className="search-pill__input"
         value={url}
-        placeholder="粘贴网页地址，或带链接的分享文字"
+        placeholder={t(
+          "粘贴网页地址，或带链接的分享文字",
+          "Paste a page URL or share text with a link",
+        )}
         spellCheck={false}
         autoComplete="off"
         disabled={crawling}
@@ -41,7 +45,7 @@ export function CrawlForm({ url, crawling, onUrlChange, onCrawl }: CrawlFormProp
         <button
           type="button"
           className="search-pill__clear"
-          aria-label="清空地址"
+          aria-label={t("清空地址", "Clear URL")}
           onClick={() => onUrlChange("")}
         >
           <CloseIcon size={15} />
@@ -54,7 +58,7 @@ export function CrawlForm({ url, crawling, onUrlChange, onCrawl }: CrawlFormProp
         loading={crawling}
         disabled={!url.trim()}
       >
-        {crawling ? "翻找中…" : "开始翻找"}
+        {crawling ? t("翻找中…", "Crawling…") : t("开始翻找", "Start crawl")}
         {!crawling && <ArrowRightIcon size={17} />}
       </Button>
     </form>

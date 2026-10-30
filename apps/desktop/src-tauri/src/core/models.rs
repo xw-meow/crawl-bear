@@ -89,6 +89,12 @@ pub struct AppSettings {
     pub max_items: usize,
     #[serde(default)]
     pub sites: Vec<LoginSite>,
+    #[serde(default = "default_language")]
+    pub language: String,
+}
+
+fn default_language() -> String {
+    "auto".to_string()
 }
 
 impl AppSettings {
@@ -108,6 +114,7 @@ impl AppSettings {
             scroll_page: true,
             max_items: 500,
             sites: Vec::new(),
+            language: default_language(),
         }
     }
 
@@ -119,6 +126,9 @@ impl AppSettings {
         }
         if self.default_kinds.is_empty() {
             self.default_kinds = Self::defaults().default_kinds;
+        }
+        if !matches!(self.language.as_str(), "auto" | "zh" | "en") {
+            self.language = default_language();
         }
         self
     }

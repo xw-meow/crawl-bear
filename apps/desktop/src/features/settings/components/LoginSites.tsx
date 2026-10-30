@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { App as AntApp, Button } from "antd";
 import { api, type LoginSite } from "../../../shared/api";
 import { toAppError } from "../../../shared/errors";
+import { getLocale, t } from "../../../shared/i18n";
 import { displayUrl, normalizeHttpUrl } from "../../../shared/format";
 import { Mascot } from "../../../shared/components/Mascot";
 import {
@@ -87,18 +88,18 @@ export function LoginSites({
   const handleAdd = async () => {
     const normalized = normalizeHttpUrl(addUrl);
     if (!normalized) {
-      message.error("网址不对，例如 https://example.com。");
+      message.error(t("网址不对，例如 https://example.com。", "That URL looks wrong, e.g. https://example.com."));
       return;
     }
     let domain = "";
     try {
       domain = new URL(normalized).host;
     } catch {
-      message.error("网址格式不正确。");
+      message.error(t("网址格式不正确。", "The URL format is invalid."));
       return;
     }
     if (sites.some((site) => site.domain === domain)) {
-      message.info(`「${domain}」已经在列表里了。`);
+      message.info(t(`「${domain}」已经在列表里了。`, `“${domain}” is already in the list.`));
       return;
     }
 
@@ -113,7 +114,7 @@ export function LoginSites({
       };
       onChange([...sites, site]);
       setAddUrl("");
-      message.success(`加上了 ${domain}，记得保存设置。`);
+      message.success(t(`加上了 ${domain}，记得保存设置。`, `Added ${domain}. Remember to save settings.`));
       try {
         const info = await api.getSiteSession(normalized);
         setCookies((previous) => ({ ...previous, [site.id]: info.cookies }));
@@ -129,7 +130,11 @@ export function LoginSites({
     setBusyId(site.id);
     try {
       const result = await api.openSiteLogin(site.url);
-      message.success(result.message || "登录窗口已打开，登录后关掉窗口就行。");
+      message.success(
+        getLocale() === "en"
+          ? t("登录窗口已打开，登录后关掉窗口就行。", "The login window is open. Close it after signing in.")
+          : result.message || t("登录窗口已打开，登录后关掉窗口就行。", "The login window is open. Close it after signing in.")
+      );
       onChange(
         sites.map((item) =>
           item.id === site.id
@@ -157,7 +162,7 @@ export function LoginSites({
     try {
       const info = await api.clearSiteSession(site.url);
       setCookies((previous) => ({ ...previous, [site.id]: info.cookies }));
-      message.success(`清掉了 ${site.domain} 的登录态。`);
+      message.success(t(`清掉了 ${site.domain} 的登录态。`, `Cleared the session for ${site.domain}.`));
     } catch (error) {
       message.error(toAppError(error).message);
     } finally {
@@ -172,13 +177,13 @@ export function LoginSites({
       delete next[site.id];
       return next;
     });
-    message.info(`移除了 ${site.domain}，保存后生效。`);
+    message.info(t(`移除了 ${site.domain}，保存后生效。`, `Removed ${site.domain}. It takes effect after saving.`));
   };
 
   const handleCloseWindow = async () => {
     try {
       await api.closeSiteLogin();
-      message.info("登录窗口已关闭。");
+      message.info(t("登录窗口已关闭。", "Login window closed."));
     } catch (error) {
       message.error(toAppError(error).message);
     }
@@ -205,14 +210,14 @@ export function LoginSites({
   return (
     <section className="panel settings-card" aria-labelledby="loginSitesTitle">
       <div className="panel__head">
-        <h2 id="loginSitesTitle">登录站点</h2>
+        <h2 id="loginSitesTitle">{t("登录站点", "Login sites")}</h2>
         <div className="settings-card__tools">
           <button type="button" className="rb-text-link" onClick={refreshAll}>
             <RefreshIcon size={12} className={refreshing ? "is-spinning" : undefined} />
-            刷新
+            {t("刷新", "Refresh")}
           </button>
           <button type="button" className="rb-text-link" onClick={() => void handleCloseWindow()}>
-            关闭登录窗口
+            {t("关闭登录窗口", "Close login window")}
           </button>
         </div>
       </div>
@@ -236,7 +241,7 @@ export function LoginSites({
             spellCheck={false}
             autoComplete="off"
             onChange={(event) => setAddUrl(event.target.value)}
-            aria-label="添加登录站点地址"
+            aria-label={t("添加登录站点地址", "Add a login site URL")}
           />
           <Button
             type="primary"
@@ -245,7 +250,7 @@ export function LoginSites({
             icon={<PlusIcon size={15} />}
             loading={adding}
           >
-            添加
+            {t("添加", "Add")}
           </Button>
         </form>
       </div>
@@ -253,7 +258,7 @@ export function LoginSites({
       {sites.length === 0 ? (
         <div className="site-empty">
           <Mascot mood="login" size={128} still />
-          <p>要翻找登录后的内容，先加个站点。</p>
+          <p>{t("要翻找登录后的内容，先加个站点。", "Add a site to crawl content behind a login.")}</p>
         </div>
       ) : (
         <ul className="site-list">
@@ -272,7 +277,7 @@ export function LoginSites({
                     </p>
                   </div>
                   <span className="site-row__cookies">
-                    {typeof count === "number" ? `${count} 个 Cookie` : "Cookie 读取中…"}
+                    {typeof count === "number" ? t(`${count} 个 Cookie`, `${count} cookies`) : t("Cookie 读取中…", "Reading cookies…")}
                   </span>
                 </div>
                 <div className="site-row__actions">
@@ -282,7 +287,7 @@ export function LoginSites({
                     loading={busyId === site.id}
                     onClick={() => void handleOpenLogin(site)}
                   >
-                    打开登录
+                    {t("打开登录", "Open login")}
                   </Button>
                   <Button
                     size="small"
@@ -290,23 +295,23 @@ export function LoginSites({
                     disabled={busyId === site.id}
                     onClick={() =>
                       modal.confirm({
-                        title: `清除 ${site.domain} 的 Cookie？`,
-                        content: "会删除该站点在本机保存的 Cookie，下次需要重新登录。",
-                        okText: "清除",
-                        cancelText: "取消",
+                        title: t(`清除 ${site.domain} 的 Cookie？`, `Clear cookies for ${site.domain}?`),
+                        content: t("会删除该站点在本机保存的 Cookie，下次需要重新登录。", "The site’s locally stored cookies will be deleted; you will need to sign in again."),
+                        okText: t("清除", "Clear"),
+                        cancelText: t("取消", "Cancel"),
                         centered: true,
                         okButtonProps: { danger: true },
                         onOk: () => void handleClear(site),
                       })
                     }
                   >
-                    清除
+                    {t("清除", "Clear")}
                   </Button>
                   <button
                     type="button"
                     className="site-row__remove"
-                    aria-label={`移除 ${site.domain}`}
-                    title="从列表移除"
+                    aria-label={t(`移除 ${site.domain}`, `Remove ${site.domain}`)}
+                    title={t("从列表移除", "Remove from list")}
                     onClick={() => handleRemove(site)}
                   >
                     <TrashIcon size={15} />

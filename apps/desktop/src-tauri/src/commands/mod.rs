@@ -212,3 +212,10 @@ pub fn remove_extension(
 ) -> Result<Vec<extensions::ExtensionStatus>, AppError> {
     extensions::remove(&app, &id)
 }
+
+
+#[tauri::command]
+pub fn set_app_language(app: AppHandle, language: String) -> Result<(), AppError> {
+    crate::build_app_menu(&app, language == "en")
+        .map_err(|error| AppError::internal(format!("无法更新菜单语言: {error}")))
+}

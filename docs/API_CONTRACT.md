@@ -53,6 +53,7 @@ interface AppSettings {
   scroll_page: boolean;
   max_items: number;        // 50..=2000
   sites: LoginSite[];
+  language: "auto" | "zh" | "en";
 }
 
 interface DownloadFile {

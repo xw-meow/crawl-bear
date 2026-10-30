@@ -10,6 +10,7 @@ import {
   safeImageUrl,
 } from "../../../shared/format";
 import { ExternalIcon, kindIcon } from "../../../shared/components/Icons";
+import { t } from "../../../shared/i18n";
 
 interface ResourcePreviewModalProps {
   resource: MediaResource | null;
@@ -107,17 +108,17 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
   const openExternal = () => {
     if (!media) return;
     void api.openUrl(media).catch((error) => {
-      message.error(error instanceof Error ? error.message : "无法打开浏览器。");
+      message.error(error instanceof Error ? error.message : t("无法打开浏览器。", "Could not open the browser."));
     });
   };
 
   const openVideoWindow = (url: string) => {
     if (!url) return;
     void api
-      .openVideoPreview(url, `视频预览 · ${name}`)
+      .openVideoPreview(url, t(`视频预览 · ${name}`, `Video preview · ${name}`))
       .then(() => onClose())
       .catch((error) => {
-        message.error(error instanceof Error ? error.message : "无法打开视频窗口。");
+        message.error(error instanceof Error ? error.message : t("无法打开视频窗口。", "Could not open the video window."));
       });
   };
 
@@ -156,7 +157,7 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
           imageFailed ? (
             <div className="preview-modal__fallback">
               <KindIcon size={40} />
-              <p>这张图暂时加载不出来，可以直接收进采集袋再查看。</p>
+              <p>{t("这张图暂时加载不出来，可以直接收进采集袋再查看。", "This image could not be loaded. Save it and inspect it locally.")}</p>
             </div>
           ) : (
             <img
@@ -173,7 +174,7 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
             type="button"
             className="preview-modal__video-page"
             onClick={openYouTube}
-            title="在独立窗口播放"
+            title={t("在独立窗口播放", "Play in a separate window")}
           >
             {!thumbFailed ? (
               <img
@@ -188,8 +189,8 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
               </span>
             )}
             <span className="preview-modal__video-page-overlay">
-              <span>YouTube 视频</span>
-              <strong>在独立窗口播放 →</strong>
+              <span>{t("YouTube 视频", "YouTube video")}</span>
+              <strong>{t("在独立窗口播放 →", "Play in a separate window →")}</strong>
             </span>
           </button>
         )}
@@ -209,13 +210,13 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
         {resource.kind === "video" && videoDirect && videoFailed && (
           <div className="preview-modal__fallback">
             <KindIcon size={40} />
-            <p>这个视频无法内嵌播放，可能是站点 CDN 的跨域限制。</p>
+            <p>{t("这个视频无法内嵌播放，可能是站点 CDN 的跨域限制。", "This video cannot play inline, likely due to a CDN cross-origin restriction.")}</p>
             <button
               type="button"
               className="rb-text-link"
               onClick={() => openVideoWindow(media)}
             >
-              在独立窗口播放
+              {t("在独立窗口播放", "Play in a separate window")}
             </button>
           </div>
         )}
@@ -225,7 +226,7 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
             type="button"
             className="preview-modal__video-page"
             onClick={() => openVideoWindow(media)}
-            title="在独立窗口播放"
+            title={t("在独立窗口播放", "Play in a separate window")}
           >
             {pageThumb && !thumbFailed ? (
               <img
@@ -240,8 +241,8 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
               </span>
             )}
             <span className="preview-modal__video-page-overlay">
-              <span>这个地址是视频页面</span>
-              <strong>在独立窗口播放 →</strong>
+              <span>{t("这个地址是视频页面", "This URL is a video page")}</span>
+              <strong>{t("在独立窗口播放 →", "Play in a separate window →")}</strong>
             </span>
           </button>
         )}
@@ -266,17 +267,17 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
                 className="preview-modal__font-sample"
                 style={{ fontFamily: `cb-preview-${resource.id}` }}
               >
-                超级爬爬熊 CrawlBear 0123456789
+                {t("超级爬爬熊 CrawlBear 0123456789", "CrawlBear 0123456789")}
               </p>
             ) : (
               <p className="preview-modal__font-sample">
-                {fontState === "loading" ? "正在加载字体…" : "这个字体无法在线预览"}
+                {fontState === "loading" ? t("正在加载字体…", "Loading font…") : t("这个字体无法在线预览", "This font cannot be previewed online")}
               </p>
             )}
             <p className="preview-modal__font-note">
               {fontState === "failed"
-                ? "字体文件受站点保护，收进采集袋后可在本机安装查看。"
-                : "字体仅在预览窗口内加载，不会安装到系统。"}
+                ? t("字体文件受站点保护，收进采集袋后可在本机安装查看。", "The font file is protected by the site. Save it and install it locally.")
+                : t("字体仅在预览窗口内加载，不会安装到系统。", "The font is loaded only for this preview and is not installed.")}
             </p>
           </div>
         )}
@@ -294,13 +295,13 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
         {media && (
           <button type="button" className="rb-text-link preview-modal__open" onClick={openExternal}>
             <ExternalIcon size={13} />
-            在浏览器中打开
+            {t("在浏览器中打开", "Open in browser")}
           </button>
         )}
       </div>
       {videoPageOnly && (
         <p className="preview-modal__note">
-          目前仅 YouTube 播放页支持应用内下载，其他站点的视频页暂不支持。
+          {t("目前仅 YouTube 播放页支持应用内下载，其他站点的视频页暂不支持。", "In-app download currently supports YouTube pages only.")}
         </p>
       )}
     </Modal>

@@ -9,6 +9,7 @@ import {
   safeImageUrl,
 } from "../../../shared/format";
 import { CheckIcon, EyeIcon, kindIcon } from "../../../shared/components/Icons";
+import { t } from "../../../shared/i18n";
 
 export type ResourceStatus = "downloading" | "success" | "failed";
 
@@ -22,9 +23,9 @@ interface ResourceCardProps {
 }
 
 const STATUS_LABELS: Record<ResourceStatus, string> = {
-  downloading: "下载中",
-  success: "已收",
-  failed: "漏了",
+  get downloading() { return t("下载中", "Downloading"); },
+  get success() { return t("已收", "Saved"); },
+  get failed() { return t("漏了", "Failed"); },
 };
 
 function previewUrl(resource: MediaResource): string {
@@ -58,7 +59,7 @@ export function ResourceCard({
       data-selected={selected || undefined}
       data-status={status}
       role="button"
-      aria-label={`预览「${name}」（${KIND_LABELS[resource.kind]}）`}
+      aria-label={t(`预览「${name}」（${KIND_LABELS[resource.kind]}）`, `Preview “${name}” (${KIND_LABELS[resource.kind]})`)}
       tabIndex={0}
       initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.96, rotate: -0.8 }}
       animate={{ opacity: 1, y: 0, scale: 1, rotate: 0 }}
@@ -104,7 +105,11 @@ export function ResourceCard({
           type="button"
           className="media-card__check"
           aria-pressed={selected}
-          aria-label={selected ? `取消选择「${name}」` : `选择「${name}」`}
+          aria-label={
+            selected
+              ? t(`取消选择「${name}」`, `Deselect “${name}”`)
+              : t(`选择「${name}」`, `Select “${name}”`)
+          }
           onClick={(event) => {
             event.stopPropagation();
             onToggle(resource.id);
@@ -115,7 +120,7 @@ export function ResourceCard({
 
         <span className="media-card__preview-hint" aria-hidden="true">
           <EyeIcon size={14} />
-          预览
+          {t("预览", "Preview")}
         </span>
 
         {duration && (

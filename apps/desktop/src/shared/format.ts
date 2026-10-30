@@ -1,4 +1,5 @@
 import type { MediaKind, MediaResource } from "./api";
+import { t } from "./i18n";
 
 export const MEDIA_KINDS: MediaKind[] = [
   "image",
@@ -9,19 +10,19 @@ export const MEDIA_KINDS: MediaKind[] = [
 ];
 
 export const KIND_LABELS: Record<MediaKind, string> = {
-  image: "图片",
-  video: "视频",
-  audio: "音乐",
-  font: "字体",
-  other: "其他",
+  get image() { return t("图片", "Images"); },
+  get video() { return t("视频", "Videos"); },
+  get audio() { return t("音乐", "Music"); },
+  get font() { return t("字体", "Fonts"); },
+  get other() { return t("其他", "Other"); },
 };
 
 export const KIND_SINGULAR: Record<MediaKind, string> = {
-  image: "张图片",
-  video: "个视频",
-  audio: "段音频",
-  font: "个字体",
-  other: "个文件",
+  get image() { return t("张图片", "image"); },
+  get video() { return t("个视频", "video"); },
+  get audio() { return t("段音频", "audio clip"); },
+  get font() { return t("个字体", "font"); },
+  get other() { return t("个文件", "file"); },
 };
 
 /** Pull the first http(s) URL out of pasted text. */
