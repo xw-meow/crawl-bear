@@ -13,6 +13,8 @@
 
 **官网：** [https://we.miework.cn/crawl-bear/index.html](https://we.miework.cn/crawl-bear/index.html)
 
+[English](README.en.md) · 中文
+
 </div>
 
 ## 这是什么
@@ -226,7 +228,7 @@ pnpm build
 
 已完成的验证：
 
-- 27 个 Rust 单元测试全部通过；
+- 28 个 Rust 单元测试全部通过；
 - 真实 WKWebView 实测百度首页：发现 79 张图片、6 个字体，`.js/.css` 等非媒体资源已被过滤；
 - 发布版 macOS 应用启动冒烟、内嵌资源与图标校验通过；
 - 首页、翻找中、结果页、预览弹窗、下载完成、设置页均逐屏截图校验（截图为本地验证产物，不随仓库提交）；
