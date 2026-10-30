@@ -68,7 +68,7 @@ export default function App() {
             我们鼓励把它用于学习与个人素材整理，不提倡、也不鼓励用于任何不当用途。
             请遵守目标网站的服务条款与著作权法律，只保存你有权使用的内容。
           </p>
-          <p className="about-modal__version">v0.3.1</p>
+          <p className="about-modal__version">v0.3.2</p>
         </div>
       ),
     });

@@ -439,7 +439,7 @@ dependencies = [
 
 [[package]]
 name = "crawl-bear"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "async-trait",
  "flate2",

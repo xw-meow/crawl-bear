@@ -344,7 +344,7 @@ export function SettingsView({
               </span>
               <div>
                 <p className="about-brand__name">超级爬爬熊 · CrawlBear</p>
-                <p className="about-brand__version">v0.3.1</p>
+                <p className="about-brand__version">v0.3.2</p>
               </div>
             </div>
             <p className="about-copy">

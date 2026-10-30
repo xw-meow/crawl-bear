@@ -1,6 +1,6 @@
 [package]
 name = "crawl-bear"
-version = "0.3.1"
+version = "0.3.2"
 description = "CrawlBear - a generic website media crawler and downloader"
 authors = ["CrawlBear"]
 edition = "2021"
