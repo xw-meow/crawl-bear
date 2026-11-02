@@ -273,7 +273,7 @@ Bilibili 播放器使用 DASH 流，直链由 `/x/player/wbi/playurl` 接口下�
 - 仅 macOS 实现；Windows/Linux 需要替换 `open`、路径与 WebView 细节。
 - `blob:` / MSE 流、iframe 内部资源、closed Shadow DOM、提取后由脚本写入的背景图无法覆盖。
 - 部分站点有反爬、登录墙、验证码；本工具不绕过验证码，只复用用户手动完成的登录状态。
-- YouTube、Bilibili 页面视频由应用内提取；其他站点（Vimeo 等）的播放页暂不支持应用内下载。
+- YouTube、Bilibili、抖音页面视频由应用内提取；其他站点（Vimeo 等）的播放页暂不支持应用内下载。
 - Bilibili 暂不支持番剧、影视、付费或充电专属内容；未登录时最高 480P。
 - 抖音支持公开的视频和图文作品；直播、主页批量作品和合集暂不支持，私密或已删除作品会提示失败。
 - YouTube/Bilibili 下载需要先在「设置 → 扩展管理」安装 FFmpeg 扩展；代理环境会自动读取 macOS 系统代理。

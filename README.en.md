@@ -272,7 +272,7 @@ UI assets such as button icons and related-video covers are filtered out, so the
 - macOS only; Windows/Linux would need platform-specific `open`, path and WebView handling.
 - `blob:` / MSE streams, resources inside iframes, closed Shadow DOM and backgrounds injected by scripts after extraction are not covered.
 - Some sites use anti-bot measures, login walls or CAPTCHAs. CrawlBear does not bypass CAPTCHAs; it only reuses a login you completed manually.
-- YouTube and Bilibili page videos are extracted in-app; video pages from other sites (Vimeo, etc.) are not supported for in-app downloads yet.
+- YouTube, Bilibili and Douyin page videos are extracted in-app; video pages from other sites (Vimeo, etc.) are not supported for in-app downloads yet.
 - Bilibili bangumi, movies, paid and “charging-exclusive” content are not supported yet; anonymous downloads top out at 480P.
 - Douyin supports public video and image posts; live streams, profile batches and collections are not supported yet, and private or deleted posts will report a failure.
 - YouTube/Bilibili downloads require the FFmpeg extension from **Settings → Extensions**; proxy environments are detected from macOS system settings.
