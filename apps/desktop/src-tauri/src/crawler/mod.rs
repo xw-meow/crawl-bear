@@ -189,6 +189,8 @@ pub async fn crawl(
         MediaKind::Other => 4,
     });
     warnings.extend(page.warnings.clone());
+    // CSSOM cross-origin noise is not actionable and fills the results header.
+    warnings.retain(|warning| !warning.starts_with("cssom:"));
 
     let needs_login = looks_like_login(&final_url, &page, total_found);
     if needs_login {

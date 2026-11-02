@@ -366,6 +366,18 @@ fn host_for_resource(url: &str) -> String {
         .unwrap_or_else(|| "douyin.com".to_string())
 }
 
+/// Images and fonts loaded by Douyin's own UI (buttons, favicon, twemoji,
+/// tracking pixels) are not page content.
+fn is_page_chrome(resource: &MediaResource) -> bool {
+    let host = resource.host.to_ascii_lowercase();
+    host.ends_with("douyinstatic.com")
+        || host.ends_with("byteimg.com")
+        || host.ends_with("bytedance.com")
+        || host.ends_with("bytescm.com")
+        || host.ends_with("baidu.com")
+        || host.ends_with("snssdk.com")
+}
+
 /// Replace raw Douyin DASH/video fragments with clean video/image resources.
 /// Returns the post title when the page was enhanced.
 pub async fn normalize_video_resources(
@@ -386,11 +398,34 @@ pub async fn normalize_video_resources(
     let aweme_id = resolve_video_id(&client, page_url).await?;
     let media = extract_media(app, &client, &aweme_id).await?;
 
-    // A Douyin post page also exposes UI assets, related-video covers and
-    // fonts.  Once the post itself is parsed, keep only its real media.
-    resources.clear();
-    let mut existing: HashSet<String> = HashSet::new();
+    // Drop UI chrome, tracking pixels and raw stream fragments; keep the
+    // post cover, author avatars and related-video covers found on the page.
+    resources.retain(|resource| !is_page_chrome(resource));
+    let mut existing: HashSet<String> = resources.iter().map(|r| r.url.clone()).collect();
     let mut added = false;
+
+    // The post cover is a real asset even though the desktop page loads it
+    // through CSS rather than an <img> tag.
+    if media.video_url.is_some() {
+        if let Some(cover) = &media.cover {
+            if existing.insert(cover.clone()) {
+                resources.push(MediaResource {
+                    id: format!("douyin-{aweme_id}-cover"),
+                    url: cover.clone(),
+                    kind: MediaKind::Image,
+                    source: ResourceSource::Link,
+                    filename_hint: Some(format!("{} - 封面", media.title)),
+                    width: media.width,
+                    height: media.height,
+                    duration: None,
+                    poster: None,
+                    alt: Some(media.title.clone()),
+                    host: host_for_resource(cover),
+                });
+                added = true;
+            }
+        }
+    }
 
     if let Some(video_url) = &media.video_url {
         if existing.insert(video_url.clone()) {

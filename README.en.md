@@ -265,7 +265,7 @@ Douyin's desktop page loads the player through signed requests, so a plain HTML 
 3. For videos, change `playwm` to `play` in the play URL to get a watermark-free MP4; for image posts, collect every image.
 4. Hand the direct URLs to the shared downloader, which follows the CDN redirect at download time.
 
-UI assets such as button icons and related-video covers are filtered out, so the results page keeps only the post's own video or images.
+UI assets such as button icons, UI fonts and tracking pixels are filtered out, while the post, covers, avatars and images on the page are kept in the results.
 
 ## Known limitations
 
