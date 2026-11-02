@@ -1,6 +1,7 @@
 pub mod classify;
 pub mod config;
 pub mod error;
+pub mod md5;
 pub mod models;
 pub mod naming;
 pub mod net;

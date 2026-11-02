@@ -44,6 +44,18 @@ function youtubeId(value: string): string | null {
   }
 }
 
+/** Recognize Bilibili /video/BV... or /video/av... pages. */
+function isBilibiliVideoPage(value: string): boolean {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.replace(/^www\./, "");
+    if (host !== "bilibili.com" && !host.endsWith(".bilibili.com")) return false;
+    return /\/video\/(?:BV[0-9A-Za-z]{10}|av\d+)/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
 /** A URL we can hand straight to a <video> element. */
 function isDirectVideo(value: string): boolean {
   return /\.(mp4|m4v|webm|mov|ogv|ogg|m3u8|mpd)(?:[?#]|$)/i.test(value);
@@ -101,6 +113,7 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
   const poster = safeImageUrl(resource.poster);
   const videoEmbed = resource.kind === "video" ? youtubeId(media) : null;
   const videoDirect = resource.kind === "video" && isDirectVideo(media);
+  const bilibiliPage = resource.kind === "video" && isBilibiliVideoPage(media);
   const videoPageOnly = resource.kind === "video" && !videoEmbed && !videoDirect;
   const youtubeThumb = videoEmbed ? `https://i.ytimg.com/vi/${videoEmbed}/hqdefault.jpg` : "";
   const pageThumb = youtubeThumb || poster;
@@ -241,7 +254,11 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
               </span>
             )}
             <span className="preview-modal__video-page-overlay">
-              <span>{t("这个地址是视频页面", "This URL is a video page")}</span>
+              <span>
+                {bilibiliPage
+                  ? t("Bilibili 视频", "Bilibili video")
+                  : t("这个地址是视频页面", "This URL is a video page")}
+              </span>
               <strong>{t("在独立窗口播放 →", "Play in a separate window →")}</strong>
             </span>
           </button>
@@ -301,7 +318,10 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
       </div>
       {videoPageOnly && (
         <p className="preview-modal__note">
-          {t("目前仅 YouTube 播放页支持应用内下载，其他站点的视频页暂不支持。", "In-app download currently supports YouTube pages only.")}
+          {t(
+            "YouTube 和 Bilibili 播放页支持应用内下载，其他站点的视频页暂不支持。",
+            "In-app download supports YouTube and Bilibili pages; other video pages are not supported yet.",
+          )}
         </p>
       )}
     </Modal>

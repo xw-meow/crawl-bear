@@ -128,7 +128,7 @@ pub fn maybe_spawn(handle: AppHandle) {
         let handle = extension_handle.clone();
         tauri::async_runtime::spawn(async move {
             tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-            let Some(resolved) = crate::downloader::resolvers::resolve(&video_url).await else {
+            let Some(resolved) = crate::downloader::resolvers::resolve(&handle, &video_url).await else {
                 eprintln!("[crawlbear][test] page video: no resolver");
                 return;
             };

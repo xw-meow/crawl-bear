@@ -15,6 +15,7 @@ use async_trait::async_trait;
 use regex::Regex;
 use serde_json::Value;
 use std::time::Duration;
+use tauri::AppHandle;
 
 const WATCH_BASE: &str = "https://www.youtube.com/watch?v=";
 const VISIONOS_UA: &str =
@@ -60,7 +61,7 @@ impl PageVideoResolver for YoutubeResolver {
         youtube_id(url).is_some()
     }
 
-    async fn resolve(&self, url: &str) -> Result<ResolvedMedia, String> {
+    async fn resolve(&self, _app: &AppHandle, url: &str) -> Result<ResolvedMedia, String> {
         let video_id = youtube_id(url)
             .ok_or_else(|| "无法识别这个 YouTube 链接。".to_string())?;
         let client = http_client()?;
@@ -282,13 +283,11 @@ mod tests {
     #[tokio::test]
     #[ignore = "network integration test"]
     async fn extracts_the_reported_video() {
-        let resolver = YoutubeResolver;
-        let media = resolver
-            .resolve("https://www.youtube.com/watch?v=ihy4w9UJFu0")
+        let client = http_client().expect("client");
+        let formats = fetch_formats(&client, "ihy4w9UJFu0")
             .await
             .expect("resolve");
-        assert!(media.video.url.starts_with("https://"));
-        assert!(media.audio.is_some());
-        assert_eq!(media.container, "mp4");
+        assert!(formats.video_url.starts_with("https://"));
+        assert!(formats.audio_url.is_some());
     }
 }

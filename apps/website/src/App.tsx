@@ -57,7 +57,7 @@ const FEATURES: Feature[] = [
   {
     icon: SparkIcon,
     title: ["专站解析", "Site-specific parsing"],
-    body: ["X、YouTube 等站点自动挑最高清晰度，结果页会亮起专属解析标签。", "X and YouTube pick the highest quality source and show a parser badge."],
+    body: ["X、YouTube、Bilibili 等站点自动挑最高清晰度，结果页会亮起专属解析标签。", "X, YouTube and Bilibili pick the highest quality source and show a parser badge."],
   },
 ];
 
@@ -333,7 +333,7 @@ export default function App() {
               </li>
               <li>
                 <CheckIcon size={15} />
-                {t("YouTube 走应用内解析，不依赖外部下载器", "YouTube uses in-app parsing, with no external downloader")}
+                {t("YouTube 和 Bilibili 走应用内解析，不依赖外部下载器", "YouTube and Bilibili use in-app parsing, with no external downloader")}
               </li>
               <li>
                 <CheckIcon size={15} />

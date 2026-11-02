@@ -36,7 +36,7 @@ The repository is a **pnpm workspace**:
 - **More than `<img>`**: scans `picture/srcset`, lazy-loaded `data-*` attributes, `<video>/<audio>/<source>`, posters, CSS backgrounds, `@font-face`, `<link rel=preload>`, `og:image/video`, inline styles, CSSOM and `performance` resource entries.
 - **Four media types**: images, videos, music and fonts, with type filters, counts and batch selection.
 - **Click to preview**: open any resource in a modal — large images, video/audio playback and live font samples.
-- **Site-specific parsing**: for X/Twitter, YouTube and other supported sites, the results page shows a “Site-specific parsing enabled” badge and prefers the highest-quality source available.
+- **Site-specific parsing**: for X/Twitter, YouTube, Bilibili and other supported sites, the results page shows a “Site-specific parsing enabled” badge and prefers the highest-quality source available.
 - **Login reuse**: add a site in “Settings → Login sites”, sign in through the embedded window, and later crawls/downloads reuse the local cookie. The app only shows the cookie count, never the values.
 - **Controlled downloads**: group files by site domain; concurrency 1–5; cancellable; HLS/DASH is remuxed to MP4 with the in-app FFmpeg extension; every item reports success or failure.
 - **Native feel**: fixed top bar, single-screen home, dedicated results page, minimal macOS menu (About / Settings / Quit) plus a native Edit menu; context menu and text selection are disabled.
@@ -75,7 +75,7 @@ Download folder, default types, concurrency, scrolling, item limit and login sit
 - Node.js 20+
 - Rust 1.77+ (rustup) and Xcode Command Line Tools
 - System `/usr/bin/curl`
-- No system ffmpeg required. Before the first YouTube/HLS download, install the in-app FFmpeg extension from **Settings → Extensions**.
+- No system ffmpeg required. Before the first YouTube/Bilibili or HLS download, install the in-app FFmpeg extension from **Settings → Extensions**.
 
 ### Extension manager
 
@@ -84,7 +84,7 @@ The Extensions panel in Settings currently provides FFmpeg:
 - Download a static build for your architecture; the app extracts, verifies and installs it under its private data directory.
 - It never writes to `/opt/homebrew`, `/usr/local` or the system PATH, and never invokes a global ffmpeg.
 - Downloads support resume/retry; after install, version, size and license are shown.
-- You can remove it at any time; YouTube muxing and HLS downloads will ask you to reinstall it.
+- You can remove it at any time; YouTube/Bilibili muxing and HLS downloads will ask you to reinstall it.
 
 ### Install dependencies
 
@@ -229,7 +229,7 @@ pnpm build
 
 Completed verification:
 
-- all 28 Rust unit tests pass;
+- all 44 Rust tests pass (3 network integration tests are ignored by default);
 - real WKWebView crawl of the Baidu homepage: 79 images and 6 fonts found; `.js` / `.css` and other non-media resources filtered out;
 - release macOS app smoke test, embedded assets and icon checks pass;
 - home, crawling, results, preview modal, download-complete and settings screens were checked screen by screen (screenshots are local validation artifacts and are not committed);
@@ -246,13 +246,24 @@ YouTube’s web player uses SABR streams + PO tokens, so the page no longer expo
 
 No `yt-dlp` or other external extractor is involved. Resolvers are pluggable: adding a new site only requires implementing a resolver; download, progress, proxy and muxing are shared. If one extraction approach stops working, a new resolver can be added at the front of the registry as a drop-in replacement.
 
+### How Bilibili downloads work
+
+Bilibili's player uses DASH. Direct stream URLs come from `/x/player/wbi/playurl` with a WBI signature (`wts` + `w_rid`):
+
+1. Parse the `BV`/`av` id and part (`?p=`) from the page, then call the view API for the title, cover and each part's cid.
+2. Request the WBI-signed playurl endpoint with the app's cookies. Signed-in users get the same quality as the website; anonymous downloads top out at 480P.
+3. Pick the best H.264 track up to 1080P and the best AAC track, then hand them to the shared downloader and mux them into MP4 with FFmpeg.
+
+`b23.tv` short links are followed through their redirect. Multi-part videos become one video entry per part on the results page, so parts can be selected individually.
+
 ## Known limitations
 
 - macOS only; Windows/Linux would need platform-specific `open`, path and WebView handling.
 - `blob:` / MSE streams, resources inside iframes, closed Shadow DOM and backgrounds injected by scripts after extraction are not covered.
 - Some sites use anti-bot measures, login walls or CAPTCHAs. CrawlBear does not bypass CAPTCHAs; it only reuses a login you completed manually.
-- YouTube page videos are extracted in-app; video pages from other sites (Vimeo, Bilibili, etc.) are not supported for in-app downloads yet.
-- YouTube downloads require the FFmpeg extension from **Settings → Extensions**; proxy environments are detected from macOS system settings.
+- YouTube and Bilibili page videos are extracted in-app; video pages from other sites (Vimeo, etc.) are not supported for in-app downloads yet.
+- Bilibili bangumi, movies, paid and “charging-exclusive” content are not supported yet; anonymous downloads top out at 480P.
+- YouTube/Bilibili downloads require the FFmpeg extension from **Settings → Extensions**; proxy environments are detected from macOS system settings.
 - Signed CDN URLs can expire; URLs are re-collected before each download and never cached.
 - Hidden windows do not trigger display refresh; a timer fallback keeps `requestAnimationFrame` alive. Lazy-loaded images that depend on `IntersectionObserver` may be fewer than in a visible browser.
 - Only download content you have the right to save. Respect each site’s terms and copyright law; do not redistribute.

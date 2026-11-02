@@ -6,6 +6,7 @@
 //! from Content-Type -> unique final rename.  Progress / per-item / done events
 //! are emitted for the UI and a `DownloadSummary` is returned.
 
+pub(crate) mod bilibili;
 mod curl;
 pub(crate) mod hls;
 mod paths;
@@ -301,7 +302,7 @@ async fn run_page_video(
     stem: &str,
     progress: &ProgressSink,
 ) -> ItemOutcome {
-    let Some(resolved) = resolvers::resolve(&item.url).await else {
+    let Some(resolved) = resolvers::resolve(app, &item.url).await else {
         return failure(item, "这个视频是网页播放页，暂时还没有可用的解析方案。");
     };
     let (resolver_id, media) = match resolved {

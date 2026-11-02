@@ -43,10 +43,12 @@
 | `src-tauri/src/core/naming.rs` | 文件名清洗、扩展名推断、去重路径 |
 | `src-tauri/src/core/classify.rs` | 扩展名/上下文 → `MediaKind` |
 | `src-tauri/src/core/webview.rs` | WebView 兼容层：统一桌面 Safari UA、隐藏窗口 rAF 兜底脚本 |
-| `src-tauri/src/crawler/` | 页面发现：WKWebView 执行 `script.js` 提取脚本、懒加载滚动 + `fallback.rs` HTML 兜底 |
+| `src-tauri/src/crawler/` | 页面发现：WKWebView 执行 `script.js` 提取脚本、懒加载滚动 + `fallback.rs` HTML 兜底；`twitter.rs` / `bilibili.rs` 做站内视频归一化 |
 | `src-tauri/src/downloader/` | 批量下载、Cookie/Referer、并发、取消、HLS；页面视频由可插拔 resolver 提取，通用下载/进度/合流复用 |
 | `src-tauri/src/downloader/resolvers.rs` | `PageVideoResolver` trait + 注册表 + 通用流下载与 FFmpeg 合流 |
 | `src-tauri/src/downloader/youtube.rs` | YouTube resolver：visionOS innertube 客户端提取直链 |
+| `src-tauri/src/downloader/bilibili.rs` | Bilibili resolver：view API + WBI 签名 playurl，DASH 音视频轨提取 |
+| `src-tauri/src/core/md5.rs` | 内置 MD5，用于 Bilibili WBI 请求签名 |
 | `src-tauri/src/extensions.rs` | 应用私有扩展管理（下载/解压/校验/移除），当前提供 FFmpeg |
 | `src-tauri/src/session/` | 通用站点登录窗口、Cookie 查询/清除 |
 

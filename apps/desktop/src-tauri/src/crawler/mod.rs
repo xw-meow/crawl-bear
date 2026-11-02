@@ -1,4 +1,5 @@
 pub mod browser;
+mod bilibili;
 mod twitter;
 pub mod fallback;
 pub mod script;
@@ -156,7 +157,9 @@ pub async fn crawl(
     let host = host_label(&final_url);
     let mut resources = to_resources(&page);
     let twitter_enhanced = twitter::normalize_video_resources(app, &page.final_url, &mut resources).await;
+    let bilibili_title = bilibili::normalize_video_resources(app, &page.final_url, &mut resources).await;
     let enhanced = twitter_enhanced
+        || bilibili_title.is_some()
         || resources
             .iter()
             .any(|resource| crate::downloader::resolvers::supports(&resource.url));
@@ -196,7 +199,7 @@ pub async fn crawl(
     Ok(CrawlResult {
         page_url: page_url.to_string(),
         final_url: final_url.to_string(),
-        title: page.title,
+        title: bilibili_title.unwrap_or(page.title),
         host,
         resources,
         counts,

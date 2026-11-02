@@ -6,6 +6,7 @@
 //! New sites never need to touch the generic download pipeline.
 
 use crate::core::net;
+use crate::downloader::bilibili::BilibiliResolver;
 use crate::downloader::youtube::YoutubeResolver;
 use crate::extensions;
 use async_trait::async_trait;
@@ -39,13 +40,14 @@ pub trait PageVideoResolver: Send + Sync {
     fn id(&self) -> &'static str;
     /// Cheap host/path check; must not perform network requests.
     fn supports(&self, url: &str) -> bool;
-    /// Extract direct stream URLs. Downloads and muxing are shared.
-    async fn resolve(&self, url: &str) -> Result<ResolvedMedia, String>;
+    /// Extract direct stream URLs. Downloads and muxing are shared. The app
+    /// handle is used to reuse the user's site session (cookies).
+    async fn resolve(&self, app: &AppHandle, url: &str) -> Result<ResolvedMedia, String>;
 }
 
 /// Ordered resolver chain. Add new (or replacement) resolvers at the front.
 fn registry() -> Vec<Box<dyn PageVideoResolver>> {
-    vec![Box::new(YoutubeResolver)]
+    vec![Box::new(BilibiliResolver), Box::new(YoutubeResolver)]
 }
 
 /// Whether any built-in resolver can handle this URL (used for UI badges).
@@ -54,7 +56,10 @@ pub fn supports(url: &str) -> bool {
 }
 
 /// Resolve a page video, falling through to the next supporting resolver on failure.
-pub async fn resolve(url: &str) -> Option<Result<(String, ResolvedMedia), String>> {
+pub async fn resolve(
+    app: &AppHandle,
+    url: &str,
+) -> Option<Result<(String, ResolvedMedia), String>> {
     let mut matched = false;
     let mut last_error = String::new();
     for resolver in registry() {
@@ -62,7 +67,7 @@ pub async fn resolve(url: &str) -> Option<Result<(String, ResolvedMedia), String
             continue;
         }
         matched = true;
-        match resolver.resolve(url).await {
+        match resolver.resolve(app, url).await {
             Ok(media) => return Some(Ok((resolver.id().to_string(), media))),
             Err(error) => {
                 eprintln!("[crawlbear] resolver {} failed: {error}", resolver.id());
@@ -228,8 +233,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn youtube_resolver_is_registered() {
+    fn page_video_resolvers_are_registered() {
         assert!(supports("https://www.youtube.com/watch?v=abc"));
+        assert!(supports("https://www.bilibili.com/video/BV1upXzBxEkp/"));
+        assert!(supports("https://b23.tv/BV1upXzBxEkp"));
+        assert!(!supports("https://www.bilibili.com/bangumi/play/ep123"));
         assert!(!supports("https://example.com/video.mp4"));
     }
 }
