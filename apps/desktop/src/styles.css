@@ -2651,7 +2651,7 @@ h3 {
 
 .site-presets__row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -2708,6 +2708,10 @@ h3 {
 
 .site-preset[data-site="x"] .site-preset__mark {
   background: var(--ink);
+}
+
+.site-preset[data-site="douyin"] .site-preset__mark {
+  background: #fe2c55;
 }
 
 .site-preset[data-site="youtube"] .site-preset__mark {

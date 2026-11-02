@@ -46,7 +46,11 @@ pub struct RawPage {
     pub body_text_len: usize,
 }
 
-async fn eval_json(win: &WebviewWindow, js: &str, timeout: StdDuration) -> Result<Value, AppError> {
+pub(crate) async fn eval_json(
+    win: &WebviewWindow,
+    js: &str,
+    timeout: StdDuration,
+) -> Result<Value, AppError> {
     let (tx, rx) = std::sync::mpsc::channel::<String>();
     win.eval_with_callback(js.to_string(), move |value| {
         let _ = tx.send(value);

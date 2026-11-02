@@ -56,6 +56,24 @@ function isBilibiliVideoPage(value: string): boolean {
   }
 }
 
+/** Douyin's play endpoint is a redirect to MP4 but has no file extension. */
+function isDouyinPlayUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    return (
+      (host === "aweme.snssdk.com" ||
+        host === "iesdouyin.com" ||
+        host.endsWith(".iesdouyin.com") ||
+        host === "douyin.com" ||
+        host.endsWith(".douyin.com")) &&
+      /\/aweme\/v1\/play(?:wm)?\/?$/i.test(url.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** A URL we can hand straight to a <video> element. */
 function isDirectVideo(value: string): boolean {
   return /\.(mp4|m4v|webm|mov|ogv|ogg|m3u8|mpd)(?:[?#]|$)/i.test(value);
@@ -112,7 +130,10 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
   const media = remoteUrl(resource.url);
   const poster = safeImageUrl(resource.poster);
   const videoEmbed = resource.kind === "video" ? youtubeId(media) : null;
-  const videoDirect = resource.kind === "video" && isDirectVideo(media);
+  // Douyin's play endpoint redirects to MP4 but needs no Referer. Opening it
+  // as a top-level window is more reliable than an inline <video> request.
+  const douyinPlay = resource.kind === "video" && isDouyinPlayUrl(media);
+  const videoDirect = resource.kind === "video" && !douyinPlay && isDirectVideo(media);
   const bilibiliPage = resource.kind === "video" && isBilibiliVideoPage(media);
   const videoPageOnly = resource.kind === "video" && !videoEmbed && !videoDirect;
   const youtubeThumb = videoEmbed ? `https://i.ytimg.com/vi/${videoEmbed}/hqdefault.jpg` : "";
@@ -255,9 +276,11 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
             )}
             <span className="preview-modal__video-page-overlay">
               <span>
-                {bilibiliPage
-                  ? t("Bilibili 视频", "Bilibili video")
-                  : t("这个地址是视频页面", "This URL is a video page")}
+                {douyinPlay
+                  ? t("抖音视频", "Douyin video")
+                  : bilibiliPage
+                    ? t("Bilibili 视频", "Bilibili video")
+                    : t("这个地址是视频页面", "This URL is a video page")}
               </span>
               <strong>{t("在独立窗口播放 →", "Play in a separate window →")}</strong>
             </span>
@@ -319,8 +342,8 @@ export function ResourcePreviewModal({ resource, onClose }: ResourcePreviewModal
       {videoPageOnly && (
         <p className="preview-modal__note">
           {t(
-            "YouTube 和 Bilibili 播放页支持应用内下载，其他站点的视频页暂不支持。",
-            "In-app download supports YouTube and Bilibili pages; other video pages are not supported yet.",
+            "YouTube、Bilibili 和抖音页面支持应用内下载，其他站点的视频页暂不支持。",
+            "In-app download supports YouTube, Bilibili and Douyin pages; other video pages are not supported yet.",
           )}
         </p>
       )}

@@ -47,7 +47,7 @@ const FEATURES: Feature[] = [
   {
     icon: LockIcon,
     title: ["登录复用", "Login reuse"],
-    body: ["Bilibili、X、YouTube 等常用站点一键打开登录，Cookie 只留在本机。", "One-click login for Bilibili, X, YouTube and more; cookies stay on your Mac."],
+    body: ["Bilibili、抖音、X、YouTube 等常用站点一键打开登录，Cookie 只留在本机。", "One-click login for Bilibili, Douyin, X, YouTube and more; cookies stay on your Mac."],
   },
   {
     icon: DownloadIcon,
@@ -57,7 +57,7 @@ const FEATURES: Feature[] = [
   {
     icon: SparkIcon,
     title: ["专站解析", "Site-specific parsing"],
-    body: ["X、YouTube、Bilibili 等站点自动挑最高清晰度，结果页会亮起专属解析标签。", "X, YouTube and Bilibili pick the highest quality source and show a parser badge."],
+    body: ["X、YouTube、Bilibili、抖音等站点自动挑最高清晰度，结果页会亮起专属解析标签。", "X, YouTube, Bilibili and Douyin pick the highest quality source and show a parser badge."],
   },
 ];
 
@@ -333,7 +333,7 @@ export default function App() {
               </li>
               <li>
                 <CheckIcon size={15} />
-                {t("YouTube 和 Bilibili 走应用内解析，不依赖外部下载器", "YouTube and Bilibili use in-app parsing, with no external downloader")}
+                {t("YouTube、Bilibili、抖音走应用内解析，不依赖外部下载器", "YouTube, Bilibili and Douyin use in-app parsing, with no external downloader")}
               </li>
               <li>
                 <CheckIcon size={15} />

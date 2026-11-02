@@ -36,8 +36,8 @@ The repository is a **pnpm workspace**:
 - **More than `<img>`**: scans `picture/srcset`, lazy-loaded `data-*` attributes, `<video>/<audio>/<source>`, posters, CSS backgrounds, `@font-face`, `<link rel=preload>`, `og:image/video`, inline styles, CSSOM and `performance` resource entries.
 - **Four media types**: images, videos, music and fonts, with type filters, counts and batch selection.
 - **Click to preview**: open any resource in a modal — large images, video/audio playback and live font samples.
-- **Site-specific parsing**: for X/Twitter, YouTube, Bilibili and other supported sites, the results page shows a “Site-specific parsing enabled” badge and prefers the highest-quality source available.
-- **Login reuse**: Bilibili, X and YouTube are built in as one-click login sites; other sites can be added manually. Sign in through the embedded window and later crawls/downloads reuse the local cookie. The app only shows the cookie count, never the values.
+- **Site-specific parsing**: for X/Twitter, YouTube, Bilibili, Douyin and other supported sites, the results page shows a “Site-specific parsing enabled” badge and prefers the highest-quality source available.
+- **Login reuse**: Bilibili, Douyin, X and YouTube are built in as one-click login sites; other sites can be added manually. Sign in through the embedded window and later crawls/downloads reuse the local cookie. The app only shows the cookie count, never the values.
 - **Controlled downloads**: group files by site domain; concurrency 1–5; cancellable; HLS/DASH is remuxed to MP4 with the in-app FFmpeg extension; every item reports success or failure.
 - **Native feel**: fixed top bar, single-screen home, dedicated results page, minimal macOS menu (About / Settings / Quit) plus a native Edit menu; context menu and text selection are disabled.
 - **Hand-drawn bear**: “Papa” the bear accompanies the crawl with sticker-style visuals and light framer-motion animations that respect reduced motion.
@@ -229,7 +229,7 @@ pnpm build
 
 Completed verification:
 
-- all 44 Rust tests pass (3 network integration tests are ignored by default);
+- all 50 Rust tests pass (3 network integration tests are ignored by default);
 - real WKWebView crawl of the Baidu homepage: 79 images and 6 fonts found; `.js` / `.css` and other non-media resources filtered out;
 - release macOS app smoke test, embedded assets and icon checks pass;
 - home, crawling, results, preview modal, download-complete and settings screens were checked screen by screen (screenshots are local validation artifacts and are not committed);
@@ -256,6 +256,17 @@ Bilibili's player uses DASH. Direct stream URLs come from `/x/player/wbi/playurl
 
 `b23.tv` short links are followed through their redirect. Multi-part videos become one video entry per part on the results page, so parts can be selected individually.
 
+### How Douyin downloads work
+
+Douyin's desktop page loads the player through signed requests, so a plain HTML fetch often only sees “video data loading”. CrawlBear opens a hidden iPhone-sized WebView on the `iesdouyin.com/share/video/<id>/` share page and waits for the post to appear in `window._ROUTER_DATA`:
+
+1. Parse the post id from a `v.douyin.com` short link or a `/video/`, `/note/` URL.
+2. Read the title, author, duration, cover and play URL from the mobile share page.
+3. For videos, change `playwm` to `play` in the play URL to get a watermark-free MP4; for image posts, collect every image.
+4. Hand the direct URLs to the shared downloader, which follows the CDN redirect at download time.
+
+UI assets such as button icons and related-video covers are filtered out, so the results page keeps only the post's own video or images.
+
 ## Known limitations
 
 - macOS only; Windows/Linux would need platform-specific `open`, path and WebView handling.
@@ -263,6 +274,7 @@ Bilibili's player uses DASH. Direct stream URLs come from `/x/player/wbi/playurl
 - Some sites use anti-bot measures, login walls or CAPTCHAs. CrawlBear does not bypass CAPTCHAs; it only reuses a login you completed manually.
 - YouTube and Bilibili page videos are extracted in-app; video pages from other sites (Vimeo, etc.) are not supported for in-app downloads yet.
 - Bilibili bangumi, movies, paid and “charging-exclusive” content are not supported yet; anonymous downloads top out at 480P.
+- Douyin supports public video and image posts; live streams, profile batches and collections are not supported yet, and private or deleted posts will report a failure.
 - YouTube/Bilibili downloads require the FFmpeg extension from **Settings → Extensions**; proxy environments are detected from macOS system settings.
 - Signed CDN URLs can expire; URLs are re-collected before each download and never cached.
 - Hidden windows do not trigger display refresh; a timer fallback keeps `requestAnimationFrame` alive. Lazy-loaded images that depend on `IntersectionObserver` may be fewer than in a visible browser.

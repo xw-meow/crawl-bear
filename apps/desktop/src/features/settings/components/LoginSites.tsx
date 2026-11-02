@@ -42,6 +42,13 @@ const PRESET_SITES: PresetSite[] = [
     mark: "B",
   },
   {
+    id: "douyin",
+    label: "Douyin",
+    url: "https://www.douyin.com/",
+    domain: "douyin.com",
+    mark: "D",
+  },
+  {
     id: "x",
     label: "X",
     url: "https://x.com/",
