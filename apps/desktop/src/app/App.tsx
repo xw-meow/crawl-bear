@@ -87,7 +87,7 @@ export default function App() {
               "Use it for learning and organizing your own media. Respect each site's terms and copyright; save only content you are allowed to use.",
             )}
           </p>
-          <p className="about-modal__version">v0.3.2</p>
+          <p className="about-modal__version">v0.4.0</p>
         </div>
       ),
     });

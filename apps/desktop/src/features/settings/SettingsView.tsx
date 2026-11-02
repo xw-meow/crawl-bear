@@ -369,7 +369,7 @@ export function SettingsView({
               </span>
               <div>
                 <p className="about-brand__name">{t("超级爬爬熊 · CrawlBear", "CrawlBear")}</p>
-                <p className="about-brand__version">v0.3.2</p>
+                <p className="about-brand__version">v0.4.0</p>
               </div>
             </div>
             <p className="about-copy">
