@@ -43,6 +43,19 @@ The repository is a **pnpm workspace**:
 - **Hand-drawn bear**: “Papa” the bear accompanies the crawl with sticker-style visuals and light framer-motion animations that respect reduced motion.
 - **Chinese / English UI**: follows the system language by default, with a manual switch in Settings. The website auto-detects the browser language and has a language switch in the nav.
 
+## Sites with dedicated support
+
+These sites use a dedicated extraction path instead of the generic crawler, and show a “Site-specific parsing enabled” badge on the results page.
+
+| Site | Supported links | Dedicated support |
+| --- | --- | --- |
+| X / Twitter | `x.com/.../status/...`, `twitter.com/...` | Skips low-quality HLS variants and keeps the highest tweet video stream (HLS muxing needs the FFmpeg extension) |
+| YouTube | `youtube.com/watch?v=...`, `youtu.be/...`, `/shorts/...` | Self-developed visionOS innertube extraction; 1080P H.264 + AAC muxed to MP4 with FFmpeg |
+| Bilibili | `bilibili.com/video/BV...`, `av...`, `b23.tv/...`, multi-part `?p=N` | WBI-signed playurl; quality follows the signed-in account; up to 1080P H.264; each part becomes its own entry |
+| Douyin | `v.douyin.com/...`, `douyin.com/video/<id>`, `/note/<id>` | Mobile share-page extraction; watermark-free 1080P; supports both video and image posts |
+
+X, YouTube, Bilibili and Douyin also have one-click login presets in **Settings → Login sites**. Other sites use the generic crawler; open a GitHub Issue if you want dedicated support for one.
+
 ## Screenshots
 
 ### Home

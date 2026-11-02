@@ -542,6 +542,116 @@ h2 {
   color: var(--ink-soft);
 }
 
+/* ---------- supported sites ---------- */
+
+.sites {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.site-card {
+  padding: 22px 22px 24px;
+  background: var(--card);
+  border: var(--outline);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.18s var(--ease);
+}
+
+.site-card:hover {
+  box-shadow: 6px 6px 0 var(--line);
+}
+
+.site-card__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.site-card__mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border: 2.5px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 2px 2px 0 var(--line);
+  color: #fff8ee;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  transform: rotate(-3deg);
+}
+
+.site-card[data-site="bilibili"] .site-card__mark {
+  background: #fb7299;
+}
+
+.site-card[data-site="youtube"] .site-card__mark {
+  background: var(--berry);
+}
+
+.site-card[data-site="x"] .site-card__mark {
+  background: var(--ink);
+}
+
+.site-card[data-site="douyin"] .site-card__mark {
+  background: #fe2c55;
+}
+
+.site-card__title h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.site-card__title span {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.site-card__body {
+  margin: 14px 0 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+.site-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-card__tags li {
+  padding: 3px 10px;
+  background: var(--paper);
+  border: 1.5px solid var(--line-soft);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sites__note {
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.sites__note a {
+  color: var(--berry-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ---------- split / preview ---------- */
 
 .split {
@@ -978,6 +1088,10 @@ h2 {
   }
 
   .features {
+    grid-template-columns: 1fr;
+  }
+
+  .sites {
     grid-template-columns: 1fr;
   }
 

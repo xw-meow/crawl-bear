@@ -43,6 +43,19 @@
 - **中英双语**：界面默认跟随系统语言，可在「设置 → 语言」切换 中文 / English；官网按浏览器语言自动选择，也可在导航栏切换。
 - **手绘小熊**：卡通漫画风的小熊「爬爬」会陪你翻找，贴纸质感与轻量动效（framer-motion，遵循 reduced-motion）。
 
+## 专属支持的站点
+
+这些站点不走普通抓取，而是有专门的解析链路；结果页会显示「专属解析已启用」。
+
+| 站点 | 支持的链接 | 专属能力 |
+| --- | --- | --- |
+| X / Twitter | `x.com/.../status/...`、`twitter.com/...` | 自动避开低清 HLS 变体，取最高清晰度视频流（HLS 合并需 FFmpeg 扩展） |
+| YouTube | `youtube.com/watch?v=...`、`youtu.be/...`、`/shorts/...` | 自研 visionOS innertube 提取；1080P H.264 + AAC，FFmpeg 合并为 MP4 |
+| Bilibili | `bilibili.com/video/BV...`、`av...`、`b23.tv/...`、`?p=N` 多 P | WBI 签名 playurl；登录后跟随账号清晰度；最高 1080P H.264；分 P 拆成多条 |
+| 抖音 Douyin | `v.douyin.com/...`、`douyin.com/video/<id>`、`/note/<id>` | 移动端分享页解析；无水印 1080P；视频与图文作品都支持 |
+
+X、YouTube、Bilibili、抖音都已内置一键登录入口（「设置 → 登录站点」）。其他网站走通用抓取；如果遇到想要专属适配的站点，欢迎在 GitHub 提 Issue。
+
 ## 界面
 
 ### 首页

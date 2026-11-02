@@ -99,6 +99,78 @@ const TECH: Array<[string, string]> = [
   ["系统代理", "System proxy"],
 ];
 
+type SupportedSite = {
+  id: string;
+  mark: string;
+  name: [string, string];
+  host: string;
+  body: [string, string];
+  tags: Array<[string, string]>;
+};
+
+const SITES: SupportedSite[] = [
+  {
+    id: "bilibili",
+    mark: "B",
+    name: ["Bilibili", "Bilibili"],
+    host: "bilibili.com · b23.tv",
+    body: [
+      "BV / av / 短链 / 多 P 都能解析，登录后跟随账号清晰度。",
+      "BV / av links, short links and multi-part posts; quality follows your account.",
+    ],
+    tags: [
+      ["WBI 签名", "WBI signed"],
+      ["最高 1080P", "Up to 1080P"],
+      ["多 P 拆条", "Multi-part"],
+    ],
+  },
+  {
+    id: "youtube",
+    mark: "Y",
+    name: ["YouTube", "YouTube"],
+    host: "youtube.com · youtu.be",
+    body: [
+      "自研 visionOS innertube 提取，不依赖外部下载器。",
+      "Our own visionOS innertube extraction, with no external downloader.",
+    ],
+    tags: [
+      ["1080P H.264", "1080P H.264"],
+      ["音视频合并", "Muxed MP4"],
+      ["Shorts", "Shorts"],
+    ],
+  },
+  {
+    id: "x",
+    mark: "X",
+    name: ["X / Twitter", "X / Twitter"],
+    host: "x.com · twitter.com",
+    body: [
+      "自动避开低清 HLS 变体，推文视频取最高档。",
+      "Skips low-quality HLS variants and keeps the highest tweet video stream.",
+    ],
+    tags: [
+      ["最高清晰度", "Highest quality"],
+      ["HLS", "HLS"],
+      ["登录复用", "Login reuse"],
+    ],
+  },
+  {
+    id: "douyin",
+    mark: "D",
+    name: ["抖音", "Douyin"],
+    host: "v.douyin.com · douyin.com",
+    body: [
+      "分享短链、视频、图文都支持；视频优先 1080P 无水印。",
+      "Short links, videos and image posts; 1080P watermark-free video when available.",
+    ],
+    tags: [
+      ["无水印", "No watermark"],
+      ["图文作品", "Image posts"],
+      ["1080P", "1080P"],
+    ],
+  },
+];
+
 export default function App() {
   const reduceMotion = useReducedMotion();
   const [locale, setLocaleState] = useState<Locale>(() => {
@@ -145,6 +217,7 @@ export default function App() {
         <nav className="nav__links" aria-label={t("主导航", "Main navigation")}>
           <a href="#features">{t("功能", "Features")}</a>
           <a href="#smart">{t("解析", "Parsing")}</a>
+          <a href="#sites">{t("支持站点", "Sites")}</a>
           <a href="#screens">{t("界面", "Screens")}</a>
           <a href="#tech">{t("技术", "Tech")}</a>
           <a href="#install">{t("安装", "Install")}</a>
@@ -350,6 +423,57 @@ export default function App() {
               </li>
             </ul>
           </motion.div>
+        </section>
+
+        <section className="section" id="sites">
+          <div className="section__head">
+            <span className="eyebrow">
+              <GlobeIcon size={12} />
+              {t("专属支持", "Site support")}
+            </span>
+            <h2>{t("这些站点，我们专门做了适配。", "Dedicated support for the sites you use most.")}</h2>
+            <p>
+              {t(
+                "结果页会亮起「专属解析已启用」，自动挑站点内可用的最高清晰度。",
+                "The results page lights up a parser badge and picks the best quality the site offers.",
+              )}
+            </p>
+          </div>
+          <div className="sites">
+            {SITES.map((site, index) => (
+              <motion.article
+                key={site.id}
+                className="site-card"
+                data-site={site.id}
+                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.35, delay: index * 0.05 }}
+                whileHover={reduceMotion ? undefined : { y: -4 }}
+              >
+                <div className="site-card__head">
+                  <span className="site-card__mark">{site.mark}</span>
+                  <div className="site-card__title">
+                    <h3>{t(site.name[0], site.name[1])}</h3>
+                    <span>{site.host}</span>
+                  </div>
+                </div>
+                <p className="site-card__body">{t(site.body[0], site.body[1])}</p>
+                <ul className="site-card__tags">
+                  {site.tags.map((tag) => (
+                    <li key={tag[0]}>{t(tag[0], tag[1])}</li>
+                  ))}
+                </ul>
+              </motion.article>
+            ))}
+          </div>
+          <p className="sites__note">
+            {t("还想支持别的站点？", "Want another site?")}{" "}
+            <a href={`${REPO}/issues`} target="_blank" rel="noreferrer">
+              {t("在 GitHub 提 Issue", "Open a GitHub Issue")}
+            </a>
+            {t("，我们会逐步适配。", " and we will add support over time.")}
+          </p>
         </section>
 
         <section className="section" id="how">
@@ -564,6 +688,7 @@ export default function App() {
             MIT License
           </a>
           <a href="#features">{t("功能", "Features")}</a>
+          <a href="#sites">{t("支持站点", "Sites")}</a>
           <a href="#download">{t("下载", "Download")}</a>
         </nav>
         <p className="footer__note">
