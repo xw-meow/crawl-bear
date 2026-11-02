@@ -47,7 +47,7 @@ const FEATURES: Feature[] = [
   {
     icon: LockIcon,
     title: ["登录复用", "Login reuse"],
-    body: ["需要登录的站点在独立窗口手动登录，Cookie 只留在本机。", "Sign in to gated sites in a separate window; cookies stay on your Mac."],
+    body: ["Bilibili、X、YouTube 等常用站点一键打开登录，Cookie 只留在本机。", "One-click login for Bilibili, X, YouTube and more; cookies stay on your Mac."],
   },
   {
     icon: DownloadIcon,

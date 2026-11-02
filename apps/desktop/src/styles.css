@@ -2624,6 +2624,120 @@ h3 {
 
 /* ---------- Login sites ---------- */
 
+.site-presets {
+  margin-top: 18px;
+}
+
+.site-presets__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.site-presets__label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.site-presets__hint {
+  font-size: 10.5px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.site-presets__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.site-preset {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s var(--ease), box-shadow 0.16s var(--ease),
+    transform 0.16s var(--ease);
+}
+
+.site-preset:hover:not(:disabled) {
+  background: var(--paper-deep);
+  box-shadow: 3px 3px 0 var(--line);
+  transform: translateY(-1px);
+}
+
+.site-preset:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.site-preset[data-added] {
+  background: var(--paper);
+}
+
+.site-preset__mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.site-preset[data-site="bilibili"] .site-preset__mark {
+  background: #fb7299;
+}
+
+.site-preset[data-site="x"] .site-preset__mark {
+  background: var(--ink);
+}
+
+.site-preset[data-site="youtube"] .site-preset__mark {
+  background: var(--berry);
+}
+
+.site-preset__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.site-preset__state {
+  display: inline-flex;
+  flex: none;
+  margin-left: auto;
+  color: var(--muted);
+}
+
+.site-preset[data-added] .site-preset__state {
+  color: var(--leaf);
+}
+
+.site-add {
+  margin-top: 12px;
+}
+
 .site-add-pill {
   display: flex;
   align-items: center;

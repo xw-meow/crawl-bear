@@ -37,7 +37,7 @@ The repository is a **pnpm workspace**:
 - **Four media types**: images, videos, music and fonts, with type filters, counts and batch selection.
 - **Click to preview**: open any resource in a modal — large images, video/audio playback and live font samples.
 - **Site-specific parsing**: for X/Twitter, YouTube, Bilibili and other supported sites, the results page shows a “Site-specific parsing enabled” badge and prefers the highest-quality source available.
-- **Login reuse**: add a site in “Settings → Login sites”, sign in through the embedded window, and later crawls/downloads reuse the local cookie. The app only shows the cookie count, never the values.
+- **Login reuse**: Bilibili, X and YouTube are built in as one-click login sites; other sites can be added manually. Sign in through the embedded window and later crawls/downloads reuse the local cookie. The app only shows the cookie count, never the values.
 - **Controlled downloads**: group files by site domain; concurrency 1–5; cancellable; HLS/DASH is remuxed to MP4 with the in-app FFmpeg extension; every item reports success or failure.
 - **Native feel**: fixed top bar, single-screen home, dedicated results page, minimal macOS menu (About / Settings / Quit) plus a native Edit menu; context menu and text selection are disabled.
 - **Hand-drawn bear**: “Papa” the bear accompanies the crawl with sticker-style visuals and light framer-motion animations that respect reduced motion.

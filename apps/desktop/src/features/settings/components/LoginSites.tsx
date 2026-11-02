@@ -6,6 +6,7 @@ import { getLocale, t } from "../../../shared/i18n";
 import { displayUrl, normalizeHttpUrl } from "../../../shared/format";
 import { Mascot } from "../../../shared/components/Mascot";
 import {
+  CheckIcon,
   LinkIcon,
   LockIcon,
   PlusIcon,
@@ -23,6 +24,48 @@ interface LoginSitesProps {
 
 type CookieState = Record<string, number | null>;
 
+interface PresetSite {
+  id: string;
+  label: string;
+  url: string;
+  domain: string;
+  mark: string;
+}
+
+/** One-click login entries for the sites people crawl most often. */
+const PRESET_SITES: PresetSite[] = [
+  {
+    id: "bilibili",
+    label: "Bilibili",
+    url: "https://www.bilibili.com/",
+    domain: "bilibili.com",
+    mark: "B",
+  },
+  {
+    id: "x",
+    label: "X",
+    url: "https://x.com/",
+    domain: "x.com",
+    mark: "X",
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    url: "https://www.youtube.com/",
+    domain: "youtube.com",
+    mark: "Y",
+  },
+];
+
+function initial(name: string): string {
+  return name.trim().charAt(0).toUpperCase() || "?";
+}
+
+/** `www.example.com` and `example.com` are the same login site. */
+function normalizedDomain(value: string): string {
+  return value.trim().toLowerCase().replace(/^www\./, "");
+}
+
 function newSiteId(): string {
   return `site-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
@@ -38,6 +81,7 @@ export function LoginSites({
   const [addUrl, setAddUrl] = useState("");
   const [adding, setAdding] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [busyPreset, setBusyPreset] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [cookies, setCookies] = useState<CookieState>({});
   const addInputRef = useRef<HTMLInputElement>(null);
@@ -93,12 +137,12 @@ export function LoginSites({
     }
     let domain = "";
     try {
-      domain = new URL(normalized).host;
+      domain = normalizedDomain(new URL(normalized).host);
     } catch {
       message.error(t("网址格式不正确。", "The URL format is invalid."));
       return;
     }
-    if (sites.some((site) => site.domain === domain)) {
+    if (sites.some((site) => normalizedDomain(site.domain) === domain)) {
       message.info(t(`「${domain}」已经在列表里了。`, `“${domain}” is already in the list.`));
       return;
     }
@@ -142,18 +186,65 @@ export function LoginSites({
             : item
         )
       );
-      window.setTimeout(async () => {
-        try {
-          const info = await api.getSiteSession(site.url);
-          setCookies((previous) => ({ ...previous, [site.id]: info.cookies }));
-        } catch {
-          /* best effort */
-        }
-      }, 1800);
+      refreshCookieSoon(site);
     } catch (error) {
       message.error(toAppError(error).message);
     } finally {
       setBusyId(null);
+    }
+  };
+
+  const refreshCookieSoon = (site: LoginSite) => {
+    window.setTimeout(async () => {
+      try {
+        const info = await api.getSiteSession(site.url);
+        setCookies((previous) => ({ ...previous, [site.id]: info.cookies }));
+      } catch {
+        /* best effort */
+      }
+    }, 1800);
+  };
+
+  const handlePreset = async (preset: PresetSite) => {
+    const existing = sites.find(
+      (site) => normalizedDomain(site.domain) === preset.domain
+    );
+    if (existing) {
+      await handleOpenLogin(existing);
+      return;
+    }
+
+    const site: LoginSite = {
+      id: newSiteId(),
+      label: preset.label,
+      url: preset.url,
+      domain: preset.domain,
+      last_opened_at: null,
+    };
+    const nextSites = [...sites, site];
+    onChange(nextSites);
+    setBusyPreset(preset.id);
+    try {
+      const result = await api.openSiteLogin(preset.url);
+      message.success(
+        getLocale() === "en"
+          ? t(`Added ${preset.label} and opened its login window. Close the window after signing in.`, `Added ${preset.label} and opened its login window. Close the window after signing in.`)
+          : result.message || t("登录窗口已打开，登录后关掉窗口就行。", "The login window is open. Close it after signing in.")
+      );
+      onChange(
+        nextSites.map((item) =>
+          item.id === site.id
+            ? { ...item, last_opened_at: Math.floor(Date.now() / 1000) }
+            : item
+        )
+      );
+      refreshCookieSoon(site);
+    } catch (error) {
+      // Window creation failed before the site was stored; undo the draft row.
+      onChange(sites);
+      message.error(toAppError(error).message);
+    } finally {
+      setBusyPreset(null);
     }
   };
 
@@ -222,6 +313,53 @@ export function LoginSites({
         </div>
       </div>
 
+      <div className="site-presets">
+        <div className="site-presets__head">
+          <span className="site-presets__label">{t("常用站点", "Popular sites")}</span>
+          <span className="site-presets__hint">
+            {t("点一下就打开登录窗口，登录后关掉即可。", "Click one to open its login window; close it after signing in.")}
+          </span>
+        </div>
+        <div className="site-presets__row">
+          {PRESET_SITES.map((preset) => {
+            const existing = sites.find(
+              (site) => normalizedDomain(site.domain) === preset.domain
+            );
+            const busy = busyPreset === preset.id || (existing != null && busyId === existing.id);
+            return (
+              <button
+                key={preset.id}
+                type="button"
+                className="site-preset"
+                data-site={preset.id}
+                data-added={existing ? "true" : undefined}
+                disabled={busy}
+                title={
+                  existing
+                    ? t(`打开 {site} 登录窗口`, `Open the {site} login window`, { site: preset.label })
+                    : t(`添加 {site} 并打开登录窗口`, `Add {site} and open its login window`, { site: preset.label })
+                }
+                onClick={() => void handlePreset(preset)}
+              >
+                <span className="site-preset__mark" aria-hidden="true">
+                  {preset.mark || initial(preset.label)}
+                </span>
+                <span className="site-preset__label">{preset.label}</span>
+                <span className="site-preset__state" aria-hidden="true">
+                  {busy ? (
+                    <RefreshIcon size={13} className="is-spinning" />
+                  ) : existing ? (
+                    <CheckIcon size={13} />
+                  ) : (
+                    <PlusIcon size={13} />
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="site-add">
         <form
           className="site-add-pill"
@@ -258,7 +396,12 @@ export function LoginSites({
       {sites.length === 0 ? (
         <div className="site-empty">
           <Mascot mood="login" size={128} still />
-          <p>{t("要翻找登录后的内容，先加个站点。", "Add a site to crawl content behind a login.")}</p>
+          <p>
+            {t(
+              "还没有添加站点。点上面的常用站点，或输入其他网站地址。",
+              "No sites yet. Pick a popular site above, or add any other URL."
+            )}
+          </p>
         </div>
       ) : (
         <ul className="site-list">
@@ -270,7 +413,7 @@ export function LoginSites({
                   <div className="site-row__main">
                     <p className="site-row__title">
                       <LockIcon size={13} />
-                      <strong>{site.domain}</strong>
+                      <strong>{site.label || site.domain}</strong>
                     </p>
                     <p className="site-row__url" title={site.url}>
                       {displayUrl(site.url, 56)}

@@ -79,7 +79,14 @@ pub async fn open_site_login(
         .map(|d| d.as_secs())
         .unwrap_or(0);
     let mut settings = state.settings();
-    if let Some(site) = settings.sites.iter_mut().find(|s| s.domain == domain) {
+    // `www.example.com` and `example.com` are the same login site; keep one row.
+    let canonical = |value: &str| value.trim_start_matches("www.").to_ascii_lowercase();
+    let domain_key = canonical(&domain);
+    if let Some(site) = settings
+        .sites
+        .iter_mut()
+        .find(|s| canonical(&s.domain) == domain_key)
+    {
         site.url = parsed.to_string();
         site.last_opened_at = Some(now);
     } else {
