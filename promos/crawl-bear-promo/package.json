@@ -16,7 +16,8 @@
     "render": "remotion render CrawlBearPromo out/crawl-bear-promo.mp4",
     "audio": "python3 scripts/make_audio.py",
     "art": "python3 scripts/apply_art.py",
-    "upgrade": "remotion upgrade"
+    "upgrade": "remotion upgrade",
+    "render:nolink": "remotion render CrawlBearPromoNoLink out/crawl-bear-promo-nolink.mp4"
   },
   "dependencies": {
     "@remotion/cli": "4.0.484",

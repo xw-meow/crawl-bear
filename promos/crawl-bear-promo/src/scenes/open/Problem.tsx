@@ -16,6 +16,7 @@ import { InkPanel } from "../../components/InkPanel";
 import { Sticker } from "../../components/Sticker";
 import { Bubble } from "../../components/Bubble";
 import { Mascot } from "../../components/Mascot";
+import { useCopy } from "../../lib/variant";
 import { CrossMark, PawPrint } from "../../components/Doodles";
 import { CursorIcon, GlobeIcon } from "../../components/Icons";
 
@@ -191,6 +192,7 @@ const PhotoTile: React.FC<{
 
 /** The failed "old way" browser window. Enters as one heavy slab. */
 const BrowserWindow: React.FC<{ frame: number }> = ({ frame }) => {
+  const copy = useCopy();
   const p = springAt(frame, 10, SPRINGS.heavy);
   const settle = Math.min(1, Math.max(0, p));
   const opacity = clamp((frame - 10) / 8);
@@ -264,7 +266,7 @@ const BrowserWindow: React.FC<{ frame: number }> = ({ frame }) => {
                 whiteSpace: "nowrap",
               }}
             >
-              {COPY.problem.windowTitle}
+              {copy.problem.windowTitle}
             </span>
           </div>
           <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
@@ -378,6 +380,7 @@ const ClickPulse: React.FC<{ frame: number; at: number; x: number; y: number }> 
  */
 export const Problem: React.FC = () => {
   const frame = useCurrentFrame();
+  const copy = useCopy();
   const exit = easeOut(clamp((frame - EXIT_AT) / 15));
 
   // Papa's slow "no no no" head shake, eased in and out.
@@ -460,10 +463,10 @@ export const Problem: React.FC = () => {
         <SceneTitle
           eyebrow={COPY.problem.eyebrow}
           eyebrowTone="card"
-          lines={["存素材，", "一直很费劲。"]}
+          lines={COPY.problem.titleLines}
           sub={COPY.problem.sub}
           startFrame={4}
-          titleSize={86}
+          titleSize={80}
           subSize={30}
           width={740}
         />

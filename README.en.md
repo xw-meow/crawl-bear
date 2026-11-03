@@ -29,7 +29,7 @@ The repository is a **pnpm workspace**:
 | --- | --- |
 | `apps/desktop` | macOS desktop app (Tauri 2 + Rust + React) |
 | `apps/website` | Marketing site (Vite + React + TypeScript), deployed at [we.miework.cn/crawl-bear](https://we.miework.cn/crawl-bear/index.html) |
-| `promos/crawl-bear-promo` | Marketing film: 54s promo video (Remotion), see [Promo film](#promo-film) |
+| `promos/crawl-bear-promo` | Marketing film: 60s promo video (Remotion), see [Promo film](#promo-film) |
 
 The full repository map and package responsibilities live in [docs/STRUCTURE.md](docs/STRUCTURE.md) (Chinese).
 
@@ -85,15 +85,16 @@ Download folder, default types, concurrency, scrolling, item limit and login sit
 
 ## Promo film
 
-`promos/crawl-bear-promo` is the marketing sub-package: a **54s, 1920×1080 / 30fps** product film written in Remotion — every frame is a React component, the soundtrack is synthesized by a script, so there is no editor project and no licensed stock media involved.
+`promos/crawl-bear-promo` is the marketing sub-package: a **60s, 1920×1080 / 30fps** product film written in Remotion (the first 6s is a personal prologue, then nine product scenes) — every frame is a React component, the soundtrack is synthesized by a script, so there is no editor project and no licensed stock media involved.
 
-<img src="assets/readme/promo.webp" alt="CrawlBear 54s promo film storyboard" width="100%" />
+<img src="assets/readme/promo.webp" alt="CrawlBear 60s promo film storyboard" width="100%" />
 
-- Nine scenes: hook → the old way → paste a URL → crawling → results → into the bag → dedicated parsers → local-only → end card;
+- Ten scenes: prologue (please spare a minute) → the reason (wanted to save media from web pages) → birth (so I wrote one, and Papa the bear was born) → paste a URL → crawling → results → into the bag → dedicated parsers → local-only → end card;
 - Preview: `pnpm dev:promo` (Remotion Studio, scrub the timeline frame by frame);
+- Two cuts: `CrawlBearPromo` (standard) and `CrawlBearPromoNoLink` (no-links cut for strict platforms such as Douyin / WeChat Channels — domains become `xxxx.xx.com` placeholders, the parser scene uses generic site types instead of platform names, and the end card says “私聊作者获取” instead of showing a URL);
 - Export: `pnpm render:promo` → `promos/crawl-bear-promo/out/crawl-bear-promo.mp4`;
 - Text / duration / music edits: see [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md);
-- To upgrade the bear illustrations, generate them with the gpt-image-2 prompts in [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) and run `pnpm --filter @crawl-bear/promo art`.
+- Only one image needs generating (the Da Fei Yu photo in the prologue); the full prompt is in [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) — drop it into `generated/` and run `pnpm --filter @crawl-bear/promo art`.
 
 ## Quick start
 
@@ -218,7 +219,7 @@ apps/                             Applications (installed / visited by users)
     public/assets/                brand / shots / generated images
     ASSETS.md                     Website image prompts
 promos/                           Marketing assets (not part of the app build)
-  crawl-bear-promo/               54s promo film (Remotion)
+  crawl-bear-promo/               60s promo film (Remotion, with prologue)
     src/                          theme / lib / components / scenes / audio
     public/assets/                brand / shots / generated images
     public/audio/                 Synthesized soundtrack and SFX
@@ -251,7 +252,7 @@ pnpm-workspace.yaml               Workspace config (apps/* + promos/*)
 | [docs/assets.md](docs/assets.md) | Image prompts for bear art, paper and icons |
 | [apps/website/ASSETS.md](apps/website/ASSETS.md) | Website hero / preview / social image prompts |
 | [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md) | Promo film: preview, render, storyboard, structure |
-| [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) | Optional 2K bear / sticker / paper texture prompts for the film |
+| [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) | Image list for the film: one image + full prompt |
 
 ## Testing and verification
 

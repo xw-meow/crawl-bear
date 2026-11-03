@@ -19,6 +19,7 @@ import { InkPanel } from "../../components/InkPanel";
 import { Sticker } from "../../components/Sticker";
 import { ProgressHoney } from "../../components/ProgressHoney";
 import { Mascot } from "../../components/Mascot";
+import { useCopy } from "../../lib/variant";
 import { Bubble } from "../../components/Bubble";
 import { PawPrint, Sparkle } from "../../components/Doodles";
 import {
@@ -453,6 +454,7 @@ const RowEntrance: React.FC<{
  * ------------------------------------------------------------------ */
 export const Crawl: React.FC = () => {
   const frame = useCurrentFrame();
+  const copy = useCopy();
 
   const exit = easeOut(clamp((frame - 216) / 22));
   const panelIn = springAt(frame, 0, SPRINGS.heavy);
@@ -611,7 +613,7 @@ export const Crawl: React.FC = () => {
                     letterSpacing: 0.5,
                   }}
                 >
-                  {COPY.paste.url}
+                  {copy.paste.url}
                 </span>
               </div>
             </RowEntrance>

@@ -1,6 +1,6 @@
 # CrawlBear 宣传短片 · 制作说明（BRIEF）
 
-> 目标：54 秒、1920×1080 / 30fps 的产品宣传短片，用 Remotion 制作，可在 Remotion Studio 里逐帧预览与调整。
+> 目标：60 秒（6s 引子 + 54s 九幕）、1920×1080 / 30fps 的产品宣传短片，用 Remotion 制作，可在 Remotion Studio 里逐帧预览与调整。
 > 视觉唯一依据：仓库根目录 `docs/design.md`（品牌 token、文案、动效规范）。本文件只写「怎么把它变成视频」。
 
 ---
@@ -16,7 +16,8 @@
 ## 2. 技术基线
 
 - 目录：`promos/crawl-bear-promo/`（pnpm workspace 子包，包名 `@crawl-bear/promo`）。
-- Composition：`CrawlBearPromo`，`1920×1080`，`30fps`，总长 `1620` 帧 = 54s。
+- Composition：`CrawlBearPromo`（标准版）与 `CrawlBearPromoNoLink`（去外链版）：`1920×1080`，`30fps`，总长 `1800` 帧 = 60s（`SCENES` 第一项是 180 帧的 prologue）。
+- 变体：场景用 `useCopy()` / `useMediaItems()` 取文案；URL 类字段只在 `lib/copy.ts` 的两个变体里定义，**不要在场景里直接 import `COPY` 渲染网址**。去外链版还会替换「专属解析」的平台名与落版 CTA（见 `lib/copy.ts` 的 `NO_LINK`）。
 - 技术栈：React 18 + Remotion 4（**不要**引入 framer-motion / gsap / 任何新依赖；用 `remotion` 的 `spring` / `interpolate` / `useCurrentFrame`）。
 - 时间轴由 `src/Promo.tsx` 持有，每个场景是一个 `<Sequence>`，**场景组件拿到的都是本地帧（从 0 开始）**。
 - 背景（纸张 + 底纹 + 暗角）由 `Promo.tsx` 全局挂一次，**场景不要自己画背景**。
@@ -27,15 +28,16 @@
 
 | # | 场景 | 本地帧 | 时长 | 文件 | 负责人 |
 |---|------|--------|------|------|--------|
-| 1 | hook 钩子 | 0–149 | 5.0s | `src/scenes/Hook.tsx` | 已完成（风格基准） |
-| 2 | problem 老办法 | 0–149 | 5.0s | `src/scenes/open/Problem.tsx` | open |
-| 3 | paste 贴网址 | 0–149 | 5.0s | `src/scenes/open/Paste.tsx` | open |
-| 4 | crawl 翻找中 | 0–239 | 8.0s | `src/scenes/core/Crawl.tsx` | core |
-| 5 | results 结果页 | 0–239 | 8.0s | `src/scenes/core/Results.tsx` | core |
-| 6 | collect 收进采集袋 | 0–209 | 7.0s | `src/scenes/close/Collect.tsx` | close |
-| 7 | sites 专属解析 | 0–164 | 5.5s | `src/scenes/open/Sites.tsx` | open |
-| 8 | privacy 本机运行 | 0–119 | 4.0s | `src/scenes/close/Privacy.tsx` | close |
-| 9 | outro 落版 | 0–194 | 6.5s | `src/scenes/close/Outro.tsx` | close |
+| 1 | prologue 引子 | 0–179 | 6.0s | `src/scenes/Prologue.tsx` | 已完成（便签 + 大肥鱼拍立得 + 交棒问题） |
+| 2 | problem 起因 | 0–149 | 5.0s | `src/scenes/open/Problem.tsx` | 已完成 |
+| 3 | birth 诞生 | 0–149 | 5.0s | `src/scenes/Birth.tsx` | 已完成（故事转折） |
+| 4 | paste 贴网址 | 0–149 | 5.0s | `src/scenes/open/Paste.tsx` | open |
+| 5 | crawl 翻找中 | 0–239 | 8.0s | `src/scenes/core/Crawl.tsx` | core |
+| 6 | results 结果页 | 0–239 | 8.0s | `src/scenes/core/Results.tsx` | core |
+| 7 | collect 收进采集袋 | 0–209 | 7.0s | `src/scenes/close/Collect.tsx` | close |
+| 8 | sites 专属解析 | 0–164 | 5.5s | `src/scenes/open/Sites.tsx` | open |
+| 9 | privacy 本机运行 | 0–119 | 4.0s | `src/scenes/close/Privacy.tsx` | close |
+| 10 | outro 落版 | 0–194 | 6.5s | `src/scenes/close/Outro.tsx` | close |
 
 **转场约定**：相邻场景不做叠化。每个场景自己负责入场（0–20 帧内建立画面）与出场（最后 12–16 帧上移淡出/元素收起），接缝靠「贴纸砸入 + 纸片上移」保持节奏。场景首帧不得全黑/全空超过 6 帧，末帧不得保留会与下一场景打架的元素。
 
@@ -89,6 +91,12 @@
 // 品牌组合标
 <Wordmark size={1} align="row" />
 
+// 和纸胶带（把便签/拍立得贴在纸上）
+<PaperTape width={236} height={54} rotate={-5} progress={1} />
+
+// 可选生图：文件存在就用图，不存在渲染 fallback（画面不阻塞）
+<OptionalArt src="assets/generated/dafeiyu.webp" fallback={<WhaleDoodle />} style={{ width: 404 }} />
+
 // 图标（线性、墨色、手绘感）
 ImageIcon VideoIcon MusicIcon FontIcon GlobeIcon CheckIcon DownloadIcon
 ArrowRightIcon LockIcon ShieldIcon CloudOffIcon SparkIcon BagIcon EyeIcon
@@ -141,4 +149,4 @@ npx tsc --noEmit          # 必须 0 error（只关心自己文件的报错，�
 ```
 - 不要运行 `npx remotion render` / `npx remotion still`（由维护者统一渲染校验，避免并行打包冲突）。
 - 交付时在回复里写：实现了哪些场景、每个场景 3–5 个关键节拍（帧号）、用到的组件、是否有自造视觉。
-- **文件所有权**：只改自己负责的场景文件（+ 自己目录下的新文件）。`src/theme.ts`、`src/lib/*`、`src/components/*`、`src/Promo.tsx`、`src/Root.tsx`、`src/scenes/Hook.tsx` 是公共文件，改了会影响所有场景；需要新增共享能力前先沟通。
+- **文件所有权**：只改自己负责的场景文件（+ 自己目录下的新文件）。`src/theme.ts`、`src/lib/*`、`src/components/*`、`src/Promo.tsx`、`src/Root.tsx`、`src/scenes/Birth.tsx` 是公共文件，改了会影响所有场景；需要新增共享能力前先沟通。

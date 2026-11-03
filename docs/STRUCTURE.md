@@ -17,7 +17,7 @@ crawl-bear/
 │   ├── desktop/                   macOS 桌面应用：Tauri 2 + Rust + React 18
 │   └── website/                   营销官网：Vite + React 18
 ├── promos/                        营销素材（产出视频 / 图片，不参与应用安装包）
-│   └── crawl-bear-promo/          54s 宣传短片：Remotion 4 + React 18
+│   └── crawl-bear-promo/          60s 宣传短片：Remotion 4 + React 18
 ├── docs/                          跨包共享的文档（设计规范、架构、契约、本文件）
 ├── assets/readme/                 README / 文档用配图（已提交）
 ├── design-assets/                 生图原稿（本地保留，不提交，可按 docs/assets.md 重新生成）
@@ -88,35 +88,37 @@ crawl-bear/
 │       ├── public/
 │       │   ├── assets/brand/       小熊 / 纸纹 / logo（prepare_assets.py 同步）
 │       │   ├── assets/shots/       真实界面截图
-│       │   ├── assets/generated/   可选生图（缺失自动回退）
+│       │   ├── assets/generated/   生图（当前只有引子的大肥鱼；缺失自动回退）
 │       │   └── og-cover.webp       社交分享图
 │       └── ASSETS.md               官网生图清单与提示词
 │
 ├── promos/                         营销素材（不参与应用构建，可独立发布）
-│   └── crawl-bear-promo/           54s 宣传短片
+│   └── crawl-bear-promo/           60s 宣传短片
 │       ├── package.json            @crawl-bear/promo
 │       ├── remotion.config.ts      Remotion 构建配置
 │       ├── tsconfig.json
 │       ├── src/
 │       │   ├── index.ts            注册根组件
-│       │   ├── Root.tsx            注册 Composition：CrawlBearPromo（1920×1080 / 30fps / 1620 帧）
+│       │   ├── Root.tsx            注册两个 Composition：CrawlBearPromo / CrawlBearPromoNoLink（1920×1080 / 30fps / 1800 帧）
 │       │   ├── Promo.tsx           总时间轴：9 个 <Sequence> + 全局纸张背景 + 章节爪印 + 音轨
 │       │   ├── theme.ts            设计 token：色板、字体栈、描边、圆角、场景时长、总帧数
 │       │   ├── lib/
 │       │   │   ├── anim.ts         spring / 擦除 / 打字机 / 计数 / 确定性伪随机
-│       │   │   └── copy.ts         全片文案 + 结果页卡片数据
+│       │   │   ├── copy.ts         全片文案 + 结果页卡片数据
+│       │   │   └── variant.tsx      变体上下文：standard / noLink（去外链版）
 │       │   ├── components/         InkPanel、Sticker、Bubble、Mascot、MediaCard、ProgressHoney…
 │       │   ├── scenes/
-│       │   │   ├── Hook.tsx        1 钩子（风格基准）
-│       │   │   ├── open/           2 老办法 · 3 贴网址 · 7 专属解析
-│       │   │   ├── core/           4 翻找中 · 5 结果页
-│       │   │   └── close/          6 收进采集袋 · 8 本机运行 · 9 落版
+│       │   │   ├── Prologue.tsx    1 引子（作者便签 + 大肥鱼拍立得）
+│       │   │   ├── Birth.tsx       3 诞生（爬爬熊登场 + 品牌名 + slogan）
+│       │   │   ├── open/           2 起因 · 4 贴网址 · 8 专属解析
+│       │   │   ├── core/           5 翻找中 · 6 结果页
+│       │   │   └── close/          7 收进采集袋 · 9 本机运行 · 10 落版
 │       │   └── audio/PromoAudio.tsx  背景乐音量包络 + 81 条音效 cue（按帧对齐）
 │       ├── public/
 │       │   ├── assets/brand/       小熊 WebP、纸纹、logo（同步自 desktop）
 │       │   ├── assets/shots/       真实界面截图（仅作还原对照）
 │       │   ├── assets/generated/   可选 2K 生图（apply_art.py 处理后覆盖 brand/）
-│       │   ├── audio/              合成配乐 54s + 5 个音效 WAV
+│       │   ├── audio/              合成配乐 60s + 5 个音效 WAV
 │       │   └── fonts/              ZCOOL KuaiLe 回退字体（SIL OFL）
 │       ├── scripts/
 │       │   ├── make_audio.py       numpy 合成配乐与音效（幂等，可重跑）
@@ -124,7 +126,7 @@ crawl-bear/
 │       ├── out/                    渲染产物 MP4 / 静帧（gitignored）
 │       ├── dist/                   remotion bundle 产物（gitignored）
 │       ├── BRIEF.md                制作规范：组件 API、转场约定、协作规则
-│       └── ASSETS.md               11 条可选生图清单 + gpt-image-2 提示词
+│       └── ASSETS.md               生图清单：1 张图 + 完整提示词
 │
 ├── assets/readme/                  README 配图（banner / 四张界面截图 / promo 分镜总览）
 ├── design-assets/                  生图原稿 PNG（本地保留，不提交；见 docs/assets.md）
@@ -168,10 +170,10 @@ crawl-bear/
 
 ### 3.3 `promos/crawl-bear-promo` —— 营销短片（不参与应用构建）
 
-- Remotion 工程：一段 54s、9 幕的产品短片，画面全部由 React 组件逐帧绘制，不依赖剪辑软件。
+- Remotion 工程：一段 60s、10 幕的产品短片（6s 引子 + 9 幕产品介绍），画面全部由 React 组件逐帧绘制，不依赖剪辑软件。
 - 结构：`Root.tsx` 注册 Composition → `Promo.tsx` 排列 `<Sequence>` → `scenes/*` 各幕 → `components/*` 共享视觉组件 → `theme.ts` token。
 - 音频：`scripts/make_audio.py` 用 numpy 合成木琴配乐 + 5 个 UI 音效；`PromoAudio.tsx` 用 `<Sequence>` 把 81 个音效钉在对应帧上。
-- 图像升级：`ASSETS.md` 列出可选的 2K 小熊 / 贴纸生成清单（gpt-image-2 提示词）；`scripts/apply_art.py` 把生成图裁边缩放成 WebP，P1 图直接覆盖 `public/assets/brand/`，零改码。
+- 生图：`ASSETS.md` 只列真正需要生成的那张图（引子拍立得里的大肥鱼，附完整 gpt-image-2 提示词）；小熊、纸纹、logo 复用现有插画，界面全部由代码绘制。`scripts/apply_art.py` 把生成图裁边缩放成 WebP，`OptionalArt` 组件探测文件，缺图自动回退手绘占位。
 - 产物：`pnpm render:promo` → `out/crawl-bear-promo.mp4`；`pnpm build:promo` → `dist/`（可部署的 bundle）。
 
 ---
@@ -214,11 +216,9 @@ design-assets/*.png                  ← 生图原稿（本地，不提交）
         ├─→ design-assets/app-icon-rounded.png               macOS 图标源
         └─→ apps/website/public/assets/brand/*              官网复用副本
 
-promos/crawl-bear-promo/public/assets/generated/*.png   ← 视频专用 2K 生图（可选）
+promos/crawl-bear-promo/public/assets/generated/*.png   ← 生图（当前只有引子的大肥鱼）
         │  pnpm --filter @crawl-bear/promo art
-        ├─→ public/assets/brand/bear-<mood>.webp    P1：直接覆盖，立即生效
-        ├─→ public/assets/brand/paper-pattern.webp  P3：纸纹底
-        └─→ public/assets/generated/*.webp          P2/P3：需在场景里接线
+        └─→ public/assets/generated/*.webp    OptionalArt 探测：有图用图，缺图回退手绘占位
 
 promos/crawl-bear-promo/scripts/make_audio.py           ← 合成音频（无需素材）
         └─→ public/audio/music-bed.wav + pop/click/stamp/whoosh/chime.wav

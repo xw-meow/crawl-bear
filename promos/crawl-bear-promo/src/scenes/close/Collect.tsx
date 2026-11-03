@@ -1,7 +1,8 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { COLORS, FONTS, RADIUS } from "../../theme";
-import { COPY, MEDIA_ITEMS } from "../../lib/copy";
+import { COPY } from "../../lib/copy";
+import { useCopy, useMediaItems } from "../../lib/variant";
 import {
   clamp,
   easeInOut,
@@ -122,6 +123,8 @@ const cursorAt = (frame: number): { x: number; y: number } => {
  * ------------------------------------------------------------------ */
 
 const ResultsBoard: React.FC<{ frame: number }> = ({ frame }) => {
+  const copy = useCopy();
+  const mediaItems = useMediaItems();
   const enter = springAt(frame, 0, SPRINGS.heavy);
   const panelOpacity = clamp(frame / 8);
   const headerP = easeOut(clamp((frame - 14) / 10));
@@ -190,7 +193,7 @@ const ResultsBoard: React.FC<{ frame: number }> = ({ frame }) => {
                   color: COLORS.ink,
                 }}
               >
-                {COPY.results.pageTitle}
+                {copy.results.pageTitle}
               </div>
               <div
                 style={{
@@ -201,7 +204,7 @@ const ResultsBoard: React.FC<{ frame: number }> = ({ frame }) => {
                   letterSpacing: 0.3,
                 }}
               >
-                {COPY.results.pageHost}
+                {copy.results.pageHost}
               </div>
             </div>
             <div style={{ ...stickerSlam(frame, 26, -2), transformOrigin: "100% 50%" }}>
@@ -291,7 +294,7 @@ const ResultsBoard: React.FC<{ frame: number }> = ({ frame }) => {
               width: GRID_W,
             }}
           >
-            {MEDIA_ITEMS.map((item, index) => {
+            {mediaItems.map((item, index) => {
               const col = index % 4;
               const row = Math.floor(index / 4);
               const at = 10 + index * 5;
@@ -384,6 +387,8 @@ const ResultsBoard: React.FC<{ frame: number }> = ({ frame }) => {
  */
 export const Collect: React.FC = () => {
   const frame = useCurrentFrame();
+  const copy = useCopy();
+  const mediaItems = useMediaItems();
 
   const exit = easeOut(clamp((frame - EXIT_AT) / (DURATION - EXIT_AT)));
 
@@ -513,7 +518,7 @@ export const Collect: React.FC = () => {
           zIndex: 5,
         }}
       >
-        <BagBar selected={selectedCount} width={BAG.width} press={press} done={done} />
+        <BagBar selected={selectedCount} width={BAG.width} press={press} done={done} path={copy.collect.path} />
       </div>
 
       {/* 收好 seal stamped across the bag's top-left corner */}

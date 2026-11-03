@@ -13,6 +13,7 @@ import {
 } from "../../lib/anim";
 import { SceneTitle } from "../../components/SceneTitle";
 import { SearchCapsule } from "../../components/SearchCapsule";
+import { useCopy } from "../../lib/variant";
 import { Sticker, CountBubble } from "../../components/Sticker";
 import { Bubble } from "../../components/Bubble";
 import { Mascot } from "../../components/Mascot";
@@ -57,11 +58,12 @@ const TapRipple: React.FC<{ frame: number; at: number }> = ({ frame, at }) => {
  */
 export const Paste: React.FC = () => {
   const frame = useCurrentFrame();
+  const copy = useCopy();
   const exit = easeOut(clamp((frame - EXIT_AT) / 15));
 
-  const typedText = typed(frame, COPY.paste.url, TYPING_START, TYPING_SPEED);
+  const typedText = typed(frame, copy.paste.url, TYPING_START, TYPING_SPEED);
   const autoFilled = frame >= AUTO_FILL_AT;
-  const text = autoFilled ? `https://${COPY.paste.url}` : typedText;
+  const text = autoFilled ? `https://${copy.paste.url}` : typedText;
   const caret = frame > 16 && (frame < AUTO_FILL_AT || blink(frame, 16, 12));
 
   const focus = easeOut(clamp((frame - 58) / 16));

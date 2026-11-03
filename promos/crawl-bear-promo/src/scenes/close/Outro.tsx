@@ -1,13 +1,15 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { COLORS, FONTS, RADIUS } from "../../theme";
-import { COPY } from "../../lib/copy";
+import { COPY, NO_LINK } from "../../lib/copy";
+import { useCopy, useVariant } from "../../lib/variant";
 import { clamp, easeInOut, easeOut, float, springAt, SPRINGS, stickerSlam } from "../../lib/anim";
 import { Mascot } from "../../components/Mascot";
 import { Bubble } from "../../components/Bubble";
 import { Wordmark } from "../../components/Wordmark";
 import { Button } from "../../components/Button";
 import { InkPanel } from "../../components/InkPanel";
+import { Sticker } from "../../components/Sticker";
 import { DownloadIcon, GlobeIcon } from "../../components/Icons";
 import { MarkerUnderline, PawPrint, Sparkle } from "../../components/Doodles";
 
@@ -16,11 +18,14 @@ const ZOOM_FROM = 130;
 
 /**
  * Scene 9 · Outro — the end card.
- * Composition echoes the hook (brand block left, bear in a honey circle right),
+ * Composition echoes the birth scene (brand block left, bear in a honey circle right),
  * then holds still on the full brand lock-up so the film can cut to black.
  */
 export const Outro: React.FC = () => {
   const frame = useCurrentFrame();
+  const copy = useCopy();
+  const variant = useVariant();
+  const noLink = variant === "noLink";
 
   const circleIn = springAt(frame, 0, SPRINGS.heavy);
   const hug = easeInOut(clamp((frame - ZOOM_FROM) / (DURATION - ZOOM_FROM)));
@@ -46,7 +51,7 @@ export const Outro: React.FC = () => {
           transformOrigin: "50% 46%",
         }}
       >
-        {/* honey desk circle behind the bear — same plain disc as the hook */}
+        {/* honey desk circle behind the bear — same plain disc as the birth scene */}
         <div
           style={{
             position: "absolute",
@@ -143,26 +148,39 @@ export const Outro: React.FC = () => {
               transformOrigin: "0% 50%",
             }}
           >
-            <InkPanel
-              padding="12px 28px"
-              radius={RADIUS.pill}
-              shadowSize={7}
-              rotate={-1}
-              style={{ display: "inline-flex", alignItems: "center", gap: 14 }}
-            >
-              <GlobeIcon size={30} color={COLORS.ink} strokeWidth={3} />
-              <span
-                style={{
-                  fontFamily: FONTS.mono,
-                  fontSize: 32,
-                  color: COLORS.ink,
-                  letterSpacing: 0.5,
-                  lineHeight: 1.2,
-                }}
+            {noLink ? (
+              <Sticker
+                tone="honey"
+                size="md"
+                shadowSize={6}
+                rotate={-1}
+                icon={<PawPrint size={26} color={COLORS.ink} />}
+                style={{ fontSize: 30 }}
               >
-                {COPY.outro.url}
-              </span>
-            </InkPanel>
+                {NO_LINK.outro.hint}
+              </Sticker>
+            ) : (
+              <InkPanel
+                padding="12px 28px"
+                radius={RADIUS.pill}
+                shadowSize={7}
+                rotate={-1}
+                style={{ display: "inline-flex", alignItems: "center", gap: 14 }}
+              >
+                <GlobeIcon size={30} color={COLORS.ink} strokeWidth={3} />
+                <span
+                  style={{
+                    fontFamily: FONTS.mono,
+                    fontSize: 32,
+                    color: COLORS.ink,
+                    letterSpacing: 0.5,
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {copy.outro.url}
+                </span>
+              </InkPanel>
+            )}
           </div>
 
           <div
@@ -174,10 +192,16 @@ export const Outro: React.FC = () => {
             }}
           >
             <Button
-              label={COPY.outro.cta}
+              label={noLink ? NO_LINK.outro.cta : COPY.outro.cta}
               tone="berry"
               size="lg"
-              icon={<DownloadIcon size={36} color="#FFFFFF" strokeWidth={4} />}
+              icon={
+                noLink ? (
+                  <PawPrint size={32} color="#FFFFFF" />
+                ) : (
+                  <DownloadIcon size={36} color="#FFFFFF" strokeWidth={4} />
+                )
+              }
             />
           </div>
 
@@ -192,7 +216,7 @@ export const Outro: React.FC = () => {
               transform: `translateY(${(1 - metaIn) * 12}px)`,
             }}
           >
-            {COPY.outro.meta}
+            {noLink ? NO_LINK.outro.meta : COPY.outro.meta}
           </div>
         </div>
 

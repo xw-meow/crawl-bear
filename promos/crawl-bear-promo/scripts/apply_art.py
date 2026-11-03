@@ -1,28 +1,21 @@
 #!/usr/bin/env python3
-"""Turn the gpt-image-2 art in `promo/public/assets/generated/` into film-ready WebP.
+"""Turn the generated art in `promos/crawl-bear-promo/public/assets/generated/` into film-ready WebP.
 
-Workflow (see `promo/ASSETS.md` for the prompt list):
+Workflow (see `promos/crawl-bear-promo/ASSETS.md` for the prompt):
 
-    1. Generate the PNGs with the prompts in `promo/ASSETS.md`.
-    2. Drop them into `promo/public/assets/generated/` using the exact filenames
-       (`bear-hero@2k.png`, `sticker-paw@2k.png`, …).
-    3. Run this script from `promo/`:
+    1. Generate the PNG with the prompt in `promos/crawl-bear-promo/ASSETS.md`.
+    2. Drop it into `promos/crawl-bear-promo/public/assets/generated/` using the exact filename
+       (`dafeiyu@2k.png`).
+    3. Run this script from `promos/crawl-bear-promo/`:
 
            python3 scripts/apply_art.py             # process + write
            python3 scripts/apply_art.py --dry-run   # show what would change
 
-What it does per file:
-    * P1 moods (bear-hero / crawl / happy / error, + optional empty / login):
-      trim the transparent margin, downscale so the long side is <= 2048 px,
-      convert to WebP and overwrite `public/assets/brand/bear-<mood>.webp`
-      (which `Mascot` already loads — no code changes needed).
-    * P2 new poses (bear-search / present / wink) and P3 stickers
-      (sticker-paw / sticker-honey-jar / stamp-collected):
-      same trim + resize, written to `public/assets/generated/<name>.webp`
-      so the Lead can wire them up (`Mascot` accepts a custom `src`).
-    * P3 paper-texture: no trimming (it is a full sheet), resized and written
-      to `public/assets/brand/paper-pattern.webp` (the global paper backdrop).
-    * Any other PNG / non-PNG file: skipped with a hint.
+What it does:
+    * trim the transparent margin, downscale so the long side is <= 2048 px,
+      convert to WebP and write `public/assets/generated/dafeiyu.webp`, which the
+      prologue's `<OptionalArt>` picks up automatically — no code changes needed.
+    * any other PNG / non-PNG file: skipped with a hint.
 
 The script never fails because a file is missing: an empty or absent
 `generated/` folder just prints a friendly "nothing to do" message. It is safe
@@ -30,7 +23,7 @@ to re-run as often as you like; outputs are overwritten deterministically.
 
 If the image generator produces an opaque cream background instead of
 transparency, the script flood-fills the background to alpha before trimming,
-so the film still composites the bear over the paper backdrop cleanly.
+so the art composites cleanly over the film's paper backdrop.
 """
 
 from __future__ import annotations
@@ -55,29 +48,14 @@ SENTINEL = (255, 0, 255)
 
 
 # ---------------------------------------------------------------------------
-# Filename -> output mapping. Keep this in sync with promo/ASSETS.md.
+# Filename -> output mapping. Keep this in sync with promos/crawl-bear-promo/ASSETS.md.
 # ---------------------------------------------------------------------------
 
 # kind: "character" = trim alpha + resize + keep transparency
 #       "sheet"     = no trimming, resize, opaque background is fine
 TARGETS: dict[str, tuple[str, str, str]] = {
-    # --- P1 · 2K replacements for the moods the film actually uses ---------
-    "bear-hero@2k.png": ("character", "assets/brand/bear-hero.webp", "P1"),
-    "bear-crawl@2k.png": ("character", "assets/brand/bear-crawl.webp", "P1"),
-    "bear-happy@2k.png": ("character", "assets/brand/bear-happy.webp", "P1"),
-    "bear-error@2k.png": ("character", "assets/brand/bear-error.webp", "P1"),
-    # optional extra moods already present in assets/brand — same pipeline
-    "bear-empty@2k.png": ("character", "assets/brand/bear-empty.webp", "P1+"),
-    "bear-login@2k.png": ("character", "assets/brand/bear-login.webp", "P1+"),
-    # --- P2 · new poses (need Lead wiring in a scene) ----------------------
-    "bear-search@2k.png": ("character", "assets/generated/bear-search.webp", "P2"),
-    "bear-present@2k.png": ("character", "assets/generated/bear-present.webp", "P2"),
-    "bear-wink@2k.png": ("character", "assets/generated/bear-wink.webp", "P2"),
-    # --- P3 · texture / stickers (optional) --------------------------------
-    "paper-texture@2k.png": ("sheet", "assets/brand/paper-pattern.webp", "P3"),
-    "sticker-paw@2k.png": ("character", "assets/generated/sticker-paw.webp", "P3"),
-    "sticker-honey-jar@2k.png": ("character", "assets/generated/sticker-honey-jar.webp", "P3"),
-    "stamp-collected@2k.png": ("character", "assets/generated/stamp-collected.webp", "P3"),
+    # 引子拍立得里的大肥鱼（OptionalArt 探测，缺图回退手绘占位）
+    "dafeiyu@2k.png": ("character", "assets/generated/dafeiyu.webp", "ART"),
 }
 
 
@@ -150,7 +128,7 @@ def describe_size(image: Image.Image) -> str:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Process gpt-image-2 art in promo/public/assets/generated/ into WebP.",
+        description="Process gpt-image-2 art in promos/crawl-bear-promo/public/assets/generated/ into WebP.",
     )
     parser.add_argument(
         "--dry-run",
@@ -195,7 +173,7 @@ def resolve_inputs(source_dir: Path) -> tuple[list[tuple[str, Path]], list[Path]
             recognised[path.name] = path
             continue
 
-        # Friendly fallback: accept `bear-hero.png` for `bear-hero@2k.png`.
+        # Friendly fallback: accept `dafeiyu.png` for `dafeiyu@2k.png`.
         alias = f"{path.stem}@2k.png"
         if alias in TARGETS:
             print(f"  note: found {path.name}, treating it as {alias} (rename it to drop this note)")
@@ -275,9 +253,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if not recognised:
         print("Nothing to process: no recognised PNG in the generated folder.")
-        print("  → Generate the images with the prompts in promo/ASSETS.md, then drop")
-        print("    them here using the exact filenames (e.g. bear-hero@2k.png).")
-        print("  → Missing art is fine: the film keeps using the current 960 px WebP.")
+        print("  → Generate the image with the prompt in promos/crawl-bear-promo/ASSETS.md, then drop")
+        print("    it here using the exact filename (e.g. dafeiyu@2k.png).")
+        print("  → Missing art is fine: the prologue falls back to its hand-drawn whale placeholder.")
         if unknown:
             print("\n  Unrecognised files (skipped):")
             for path in unknown:
@@ -294,7 +272,7 @@ def main(argv: list[str] | None = None) -> int:
         print("\nSkipped — filename not in the mapping table:")
         for path in unknown:
             print(f"  - {path.name}")
-        print("  → expected names are listed in promo/ASSETS.md; rename and re-run.")
+        print("  → expected names are listed in promos/crawl-bear-promo/ASSETS.md; rename and re-run.")
 
     counts: dict[str, int] = {}
     for item in processed:
@@ -305,8 +283,6 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\nDone — {verb} {len(processed)} file(s) ({summary}).")
     if args.dry_run:
         print("Re-run without --dry-run to write the WebP files.")
-    if not args.dry_run and any(str(item["tier"]).startswith("P2") for item in processed):
-        print("P2 poses were written to assets/generated/*.webp — tell the Lead to wire them in.")
     return 0
 
 

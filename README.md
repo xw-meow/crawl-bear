@@ -29,7 +29,7 @@
 | --- | --- |
 | `apps/desktop` | macOS 桌面应用（Tauri 2 + Rust + React） |
 | `apps/website` | 官网（Vite + React + TypeScript），已部署到 [we.miework.cn/crawl-bear](https://we.miework.cn/crawl-bear/index.html) |
-| `promos/crawl-bear-promo` | 营销素材：54 秒宣传短片（Remotion），见 [宣传短片](#宣传短片) |
+| `promos/crawl-bear-promo` | 营销素材：60 秒宣传短片（Remotion），见 [宣传短片](#宣传短片) |
 
 完整的工程结构与各包职责见 [docs/STRUCTURE.md](docs/STRUCTURE.md)。
 
@@ -85,15 +85,16 @@ X、YouTube、Bilibili、抖音都已内置一键登录入口（「设置 → �
 
 ## 宣传短片
 
-`promos/crawl-bear-promo` 是仓库里的营销素材子包：一段 **54 秒、1920×1080 / 30fps** 的产品短片，用 Remotion 写成——画面全部由 React 组件逐帧绘制，配乐与音效由脚本合成，不依赖剪辑软件，也不依赖任何版权素材。
+`promos/crawl-bear-promo` 是仓库里的营销素材子包：一段 **60 秒、1920×1080 / 30fps** 的产品短片（开头 6 秒是作者口吻的「引子」，然后是九幕产品介绍），用 Remotion 写成——画面全部由 React 组件逐帧绘制，配乐与音效由脚本合成，不依赖剪辑软件，也不依赖任何版权素材。
 
-<img src="assets/readme/promo.webp" alt="CrawlBear 54 秒宣传短片分镜" width="100%" />
+<img src="assets/readme/promo.webp" alt="CrawlBear 60 秒宣传短片分镜" width="100%" />
 
-- 九幕：钩子 → 老办法 → 贴网址 → 翻找中 → 结果页 → 收进采集袋 → 专属解析 → 本机运行 → 落版；
+- 十幕：引子（求你看一分钟）→ 起因（想存网页素材）→ 诞生（干脆自己写，爬爬熊登场）→ 贴网址 → 翻找中 → 结果页 → 收进采集袋 → 专属解析 → 本机运行 → 落版；
 - 预览：`pnpm dev:promo`（Remotion Studio，可拖时间轴逐帧看）；
-- 出片：`pnpm render:promo` → `promos/crawl-bear-promo/out/crawl-bear-promo.mp4`；
+- 两个版本：`CrawlBearPromo`（标准版）和 `CrawlBearPromoNoLink`（去外链版：域名用 `xxxx.xx.com` 占位、专属解析不出现平台名、落版改成「私聊作者获取」，给抖音 / 视频号等审核较严的平台）；
+- 出片：`pnpm render:promo`（标准版）/ `pnpm render:promo:nolink`（去外链版）→ `promos/crawl-bear-promo/out/*.mp4`；
 - 改文案 / 时长 / 配乐：见 [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md)；
-- 需要替换/升级小熊插画时，按 [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) 的清单用 gpt-image-2 生图，再跑 `pnpm --filter @crawl-bear/promo art`。
+- 只有 1 张图需要自己生成（引子拍立得里的大肥鱼），完整提示词见 [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md)，放在 `generated/` 后跑 `pnpm --filter @crawl-bear/promo art` 即可。
 
 ## 快速开始
 
@@ -175,7 +176,7 @@ python3 scripts/prepare_assets.py
 # 图标有改动时，重新生成 Tauri 图标
 pnpm --filter @crawl-bear/desktop exec tauri icon ../../design-assets/app-icon-rounded.png
 
-# 宣传片：把生成的 2K 插画处理成 WebP（清单见 promos/crawl-bear-promo/ASSETS.md）
+# 宣传片：把生成图处理成 WebP（清单见 promos/crawl-bear-promo/ASSETS.md）
 pnpm --filter @crawl-bear/promo art
 
 # 宣传片：重新合成配乐与音效（python3 + numpy，幂等）
@@ -219,7 +220,7 @@ apps/                             应用（用户直接安装 / 访问）
     public/assets/                brand / shots / generated 图片
     ASSETS.md                     官网生图提示词
 promos/                           营销素材（不参与应用构建）
-  crawl-bear-promo/               54s 宣传短片（Remotion）
+  crawl-bear-promo/               60s 宣传短片（Remotion，含引子）
     src/                          theme / lib / components / scenes / audio
     public/assets/                brand / shots / generated 图片
     public/audio/                 合成配乐与音效
@@ -252,7 +253,7 @@ pnpm-workspace.yaml               workspace 配置（apps/* + promos/*）
 | [docs/assets.md](docs/assets.md) | 小熊插画 / 底纹 / 图标的生图提示词 |
 | [apps/website/ASSETS.md](apps/website/ASSETS.md) | 官网首屏 / 预览区块 / 社交分享图提示词 |
 | [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md) | 宣传短片：预览、渲染、分镜、目录结构 |
-| [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) | 宣传短片可选 2K 插画 / 贴纸 / 纸纹清单与提示词 |
+| [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) | 宣传短片的生图清单：1 张图 + 完整提示词 |
 
 ## 测试与验证
 

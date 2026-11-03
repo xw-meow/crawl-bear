@@ -82,8 +82,9 @@ export const TYPE = {
  * local frame starting at 0. Sum of durations = composition duration.
  */
 export const SCENES = [
-  { id: "hook", duration: 150 },
+  { id: "prologue", duration: 180 },
   { id: "problem", duration: 150 },
+  { id: "birth", duration: 150 },
   { id: "paste", duration: 150 },
   { id: "crawl", duration: 240 },
   { id: "results", duration: 240 },

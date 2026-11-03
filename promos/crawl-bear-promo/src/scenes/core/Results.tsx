@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { COLORS, FONTS, INK, RADIUS, shadow } from "../../theme";
 import { COPY, MEDIA_ITEMS, type MediaKind } from "../../lib/copy";
+import { useCopy, useMediaItems } from "../../lib/variant";
 import {
   clamp,
   easeInOut,
@@ -190,6 +191,7 @@ const PreviewModal: React.FC<{ frame: number; item: (typeof MEDIA_ITEMS)[number]
   frame,
   item,
 }) => {
+  const copy = useCopy();
   if (frame < 96 || frame > 186) return null;
   const closeT = easeOut(clamp((frame - 168) / 14));
   const opacity = clamp((frame - 96) / 6) * (1 - closeT);
@@ -239,7 +241,7 @@ const PreviewModal: React.FC<{ frame: number; item: (typeof MEDIA_ITEMS)[number]
               {COPY.results.preview}
             </Sticker>
             <span style={{ fontFamily: FONTS.body, fontSize: 22, color: COLORS.inkSoft }}>
-              {COPY.results.pageTitle}
+              {copy.results.pageTitle}
             </span>
           </div>
           <div
@@ -494,12 +496,14 @@ const CursorLayer: React.FC<{ frame: number }> = ({ frame }) => {
  * ------------------------------------------------------------------ */
 export const Results: React.FC = () => {
   const frame = useCurrentFrame();
+  const copy = useCopy();
+  const mediaItems = useMediaItems();
 
   const exit = easeOut(clamp((frame - 218) / 20));
   const panelSp = springAt(frame, 0, SPRINGS.heavy);
   const panelOpacity = clamp(frame / 8);
 
-  const previewItem = MEDIA_ITEMS[3]; // mountain-lake.jpg
+  const previewItem = mediaItems[3]; // mountain-lake.jpg
 
   // hover on the fourth card, released as the preview opens
   const hoverP = easeOut(clamp((frame - 80) / 10)) * (1 - easeOut(clamp((frame - 96) / 8)));
@@ -611,7 +615,7 @@ export const Results: React.FC = () => {
                     color: COLORS.ink,
                   }}
                 >
-                  {COPY.results.pageTitle}
+                  {copy.results.pageTitle}
                 </div>
                 <div
                   style={{
@@ -622,7 +626,7 @@ export const Results: React.FC = () => {
                     letterSpacing: 0.3,
                   }}
                 >
-                  {COPY.results.pageHost}
+                  {copy.results.pageHost}
                 </div>
               </div>
               <div style={{ ...stickerSlam(frame, 26, -2), transformOrigin: "100% 50%" }}>
@@ -719,7 +723,7 @@ export const Results: React.FC = () => {
                 width: GRID_W,
               }}
             >
-              {MEDIA_ITEMS.map((item, index) => {
+              {mediaItems.map((item, index) => {
                 const at = 14 + index * 5;
                 const enter = springAt(frame, at, SPRINGS.smooth);
                 const col = index % 4;

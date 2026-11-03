@@ -8,11 +8,11 @@ again overwrites the same files with byte-identical audio.
 Run with the DSH runtime Python (numpy lives there):
 
     /Users/dengwei.daviant/.dsh/dsh-runtimes/dsh-primary-runtime/dependencies/python/bin/python3 \
-        promo/scripts/make_audio.py
+        promos/crawl-bear-promo/scripts/make_audio.py
 
-Outputs (promo/public/audio/):
+Outputs (promos/crawl-bear-promo/public/audio/):
 
-  music-bed.wav   54.0 s · 44.1 kHz · stereo · 16-bit
+  music-bed.wav   60.0 s · 44.1 kHz · stereo · 16-bit
                   Warm "journal / marimba" bed at 96 BPM. C major pentatonic,
                   4/4, one chord per bar, loop C – G/B – Am – F. Marimba
                   eighth-note arpeggios (root / fifth / octave / third) with
@@ -52,10 +52,10 @@ import numpy as np
 # ---------------------------------------------------------------------------
 
 SR = 44100
-ROOT = Path(__file__).resolve().parent.parent  # -> promo/
+ROOT = Path(__file__).resolve().parent.parent  # -> promos/crawl-bear-promo/
 OUT_DIR = ROOT / "public" / "audio"
 
-MUSIC_DURATION = 54.0  # exactly the film length (1620 frames @ 30 fps)
+MUSIC_DURATION = 60.0  # exactly the film length (1800 frames @ 30 fps)
 BPM = 96.0
 BEAT = 60.0 / BPM  # 0.625 s
 BAR = 4.0 * BEAT  # 2.5 s
@@ -258,7 +258,7 @@ ARPEGGIO_PATTERNS = [
 
 
 def build_music() -> tuple[np.ndarray, dict[str, np.ndarray]]:
-    """Render the 54 s music bed. Returns (stereo_mix, stem_dict)."""
+    """Render the 60 s music bed. Returns (stereo_mix, stem_dict)."""
     total = int(round(SR * MUSIC_DURATION))
     pluck_bus = np.zeros((2, total), dtype=np.float64)
     pad_bus = np.zeros((2, total), dtype=np.float64)
@@ -328,7 +328,7 @@ def build_music() -> tuple[np.ndarray, dict[str, np.ndarray]]:
 
         # --- bars 4–8 lift: one soft high bell per downbeat -------------
         # A gentle 1.4 s swell around bar 5 plus a sparse octave-up note keeps
-        # the middle of the 54 s from feeling static.
+        # the middle of the 60 s from feeling static.
         if 3 <= bar <= 7:
             lift_midi = chord["tones"][2] + 12
             lift = marimba_note(midi_hz(lift_midi), 0.16, ring=1.1)

@@ -1,13 +1,22 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { COLORS, FONTS, INK, RADIUS, shadow } from "../../theme";
-import { COPY } from "../../lib/copy";
+import { COPY, NO_LINK } from "../../lib/copy";
 import { clamp, easeOut, ramp, springAt, SPRINGS, stickerSlam } from "../../lib/anim";
 import { SceneTitle } from "../../components/SceneTitle";
 import { Sticker } from "../../components/Sticker";
 import { SiteBadge } from "../../components/SiteBadge";
-import { CheckIcon, ArrowRightIcon, type SiteKey } from "../../components/Icons";
+import {
+  ArrowRightIcon,
+  CheckIcon,
+  FolderIcon,
+  ImageIcon,
+  MusicIcon,
+  VideoIcon,
+  type SiteKey,
+} from "../../components/Icons";
 import { MarkerUnderline, Sparkle } from "../../components/Doodles";
+import { useVariant } from "../../lib/variant";
 
 const DURATION = 165;
 const EXIT_AT = 149;
@@ -119,8 +128,91 @@ const QualityStep: React.FC<{
  * Scene 7 · Sites — sites that are hard to scrape get their own parser,
  * and the bear quietly picks the highest quality available.
  */
+
+/** 去外链版的通用站点图标（不出现任何平台名）。 */
+const GENERIC_ICONS = {
+  video: VideoIcon,
+  image: ImageIcon,
+  music: MusicIcon,
+  folder: FolderIcon,
+} as const;
+
+const GENERIC_TONES = [COLORS.skySoft, "#E6F0DE", "#FBE0D8", COLORS.paperDeep];
+
+const GenericSiteCard: React.FC<{
+  icon: keyof typeof GENERIC_ICONS;
+  toneIndex: number;
+  name: string;
+  note: string;
+  width?: number;
+}> = ({ icon, toneIndex, name, note, width = 430 }) => {
+  const Icon = GENERIC_ICONS[icon];
+  return (
+    <div
+      style={{
+        width,
+        height: 132,
+        display: "flex",
+        alignItems: "center",
+        gap: 18,
+        padding: "0 24px",
+        background: COLORS.card,
+        border: `${INK.regular}px solid ${COLORS.ink}`,
+        borderRadius: RADIUS.md,
+        boxShadow: shadow(7),
+      }}
+    >
+      <div
+        style={{
+          width: 66,
+          height: 66,
+          borderRadius: 18,
+          background: GENERIC_TONES[toneIndex % GENERIC_TONES.length],
+          border: `${INK.regular}px solid ${COLORS.ink}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <Icon size={34} color={COLORS.ink} strokeWidth={3} />
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div
+          style={{
+            fontFamily: FONTS.display,
+            fontWeight: 700,
+            fontSize: 34,
+            color: COLORS.ink,
+            lineHeight: 1.2,
+            letterSpacing: 0.5,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {name}
+        </div>
+        <div
+          style={{
+            marginTop: 5,
+            fontFamily: FONTS.body,
+            fontSize: 22,
+            color: COLORS.muted,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {note}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const Sites: React.FC = () => {
   const frame = useCurrentFrame();
+  const variant = useVariant();
+  const genericSites = variant === "noLink";
   const exit = easeOut(clamp((frame - EXIT_AT) / 15));
   const baselineProgress = easeOut(ramp(frame, 82, 20));
 
@@ -182,11 +274,23 @@ export const Sites: React.FC = () => {
           gap: "22px 28px",
         }}
       >
-        {COPY.sites.sites.map((site, index) => (
-          <div key={site.name} style={stickerSlam(frame, 12 + index * 8, SITE_ROTATION[index])}>
-            <SiteBadge site={SITE_KEYS[index]} name={site.name} note={site.note} width={430} />
-          </div>
-        ))}
+        {genericSites
+          ? NO_LINK.sites.map((site, index) => (
+              <div key={site.name} style={stickerSlam(frame, 12 + index * 8, SITE_ROTATION[index])}>
+                <GenericSiteCard
+                  icon={site.icon}
+                  toneIndex={index}
+                  name={site.name}
+                  note={site.note}
+                  width={430}
+                />
+              </div>
+            ))
+          : COPY.sites.sites.map((site, index) => (
+              <div key={site.name} style={stickerSlam(frame, 12 + index * 8, SITE_ROTATION[index])}>
+                <SiteBadge site={SITE_KEYS[index]} name={site.name} note={site.note} width={430} />
+              </div>
+            ))}
       </div>
 
       {/* Quality ladder */}

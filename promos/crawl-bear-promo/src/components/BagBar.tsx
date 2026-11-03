@@ -1,6 +1,7 @@
 import React from "react";
 import { COLORS, FONTS, INK, shadow } from "../theme";
 import { COPY } from "../lib/copy";
+import { useCopy } from "../lib/variant";
 import { BagIcon, CheckIcon, DownloadIcon, FolderIcon } from "./Icons";
 import { PawPrint } from "./Doodles";
 import { Button } from "./Button";
@@ -24,13 +25,15 @@ type BagBarProps = {
 export const BagBar: React.FC<BagBarProps> = ({
   selected,
   press = 0,
-  path = COPY.collect.path,
+  path,
   cta = COPY.collect.cta,
   done = false,
   scale = 1,
   style,
   width = 760,
 }) => {
+  const copy = useCopy();
+  const resolvedPath = path ?? copy.collect.path;
   const active = selected > 0;
   return (
     <div
@@ -113,7 +116,7 @@ export const BagBar: React.FC<BagBarProps> = ({
           }}
         >
           {done ? <FolderIcon size={20 * scale} color={COLORS.muted} strokeWidth={3} /> : <BagIcon size={20 * scale} color={COLORS.muted} strokeWidth={3} />}
-          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{path}</span>
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{resolvedPath}</span>
         </div>
       </div>
 

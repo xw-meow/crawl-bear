@@ -6,8 +6,10 @@ import { FontLoader } from "./components/FontLoader";
 import { PawPrint } from "./components/Doodles";
 import { PromoAudio } from "./audio/PromoAudio";
 import { fadeIn, fadeOut } from "./lib/anim";
+import { PromoVariantProvider, type PromoVariant } from "./lib/variant";
 
-import { Hook } from "./scenes/Hook";
+import { Prologue } from "./scenes/Prologue";
+import { Birth } from "./scenes/Birth";
 import { Problem } from "./scenes/open/Problem";
 import { Paste } from "./scenes/open/Paste";
 import { Sites } from "./scenes/open/Sites";
@@ -18,7 +20,8 @@ import { Privacy } from "./scenes/close/Privacy";
 import { Outro } from "./scenes/close/Outro";
 
 const SCENE_COMPONENTS: Record<SceneId, React.FC> = {
-  hook: Hook,
+  prologue: Prologue,
+  birth: Birth,
   problem: Problem,
   paste: Paste,
   crawl: Crawl,
@@ -40,7 +43,7 @@ const ChapterPaws: React.FC<{ frame: number }> = ({ frame }) => {
   // The results / collect scenes run a full-bleed panel down to y=1040, so the
   // paw markers step aside for those two scenes instead of sitting on the cards.
   const resultsIn = sceneStart("results") - 6;
-  const collectEnd = sceneStart("collect") + 210;
+  const collectEnd = sceneStart("sites");
   const blocked = Math.min(fadeIn(frame, resultsIn, 10), 1 - fadeIn(frame, collectEnd - 8, 10));
 
   const visibility = Math.min(
@@ -87,12 +90,13 @@ const ChapterPaws: React.FC<{ frame: number }> = ({ frame }) => {
  * CrawlBear — 54s promo film.
  * 1920×1080 · 30fps. Every scene is a Sequence that starts its own local frame at 0.
  */
-export const Promo: React.FC = () => {
+export const Promo: React.FC<{ variant?: PromoVariant }> = ({ variant = "standard" }) => {
   const frame = useCurrentFrame();
   let cursor = 0;
 
   return (
-    <AbsoluteFill style={{ backgroundColor: COLORS.paper }}>
+    <PromoVariantProvider variant={variant}>
+      <AbsoluteFill style={{ backgroundColor: COLORS.paper }}>
       <FontLoader />
       <PaperBackground />
 
@@ -113,9 +117,10 @@ export const Promo: React.FC = () => {
         );
       })}
 
-      <ChapterPaws frame={frame} />
-      <PromoAudio />
-    </AbsoluteFill>
+        <ChapterPaws frame={frame} />
+        <PromoAudio />
+      </AbsoluteFill>
+    </PromoVariantProvider>
   );
 };
 
@@ -126,13 +131,15 @@ export const SCENE_MARKS = SCENES.map((scene, index) => ({
 }));
 
 export const KEY_ANCHORS = {
-  hookTitle: 40,
-  problemTitle: SCENE_MARKS[1].start + 30,
-  pasteCapsule: SCENE_MARKS[2].start + 26,
-  crawlProgress: SCENE_MARKS[3].start + 120,
-  resultsGrid: SCENE_MARKS[4].start + 60,
-  collectBag: SCENE_MARKS[5].start + 150,
-  sites: SCENE_MARKS[6].start + 90,
-  privacy: SCENE_MARKS[7].start + 40,
-  outro: SCENE_MARKS[8].start + 90,
+  prologueCard: sceneStart("prologue") + 40,
+  prologueBridge: sceneStart("prologue") + 130,
+  birthSetup: sceneStart("birth") + 20,
+  problemTitle: sceneStart("problem") + 30,
+  pasteCapsule: sceneStart("paste") + 26,
+  crawlProgress: sceneStart("crawl") + 120,
+  resultsGrid: sceneStart("results") + 60,
+  collectBag: sceneStart("collect") + 150,
+  sites: sceneStart("sites") + 90,
+  privacy: sceneStart("privacy") + 40,
+  outro: sceneStart("outro") + 90,
 } as const;
