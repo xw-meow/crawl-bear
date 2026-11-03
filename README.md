@@ -29,6 +29,9 @@
 | --- | --- |
 | `apps/desktop` | macOS 桌面应用（Tauri 2 + Rust + React） |
 | `apps/website` | 官网（Vite + React + TypeScript），已部署到 [we.miework.cn/crawl-bear](https://we.miework.cn/crawl-bear/index.html) |
+| `promos/crawl-bear-promo` | 营销素材：54 秒宣传短片（Remotion），见 [宣传短片](#宣传短片) |
+
+完整的工程结构与各包职责见 [docs/STRUCTURE.md](docs/STRUCTURE.md)。
 
 ## 特性
 
@@ -80,6 +83,18 @@ X、YouTube、Bilibili、抖音都已内置一键登录入口（「设置 → �
 
 <img src="assets/readme/settings.webp" alt="设置" width="100%" />
 
+## 宣传短片
+
+`promos/crawl-bear-promo` 是仓库里的营销素材子包：一段 **54 秒、1920×1080 / 30fps** 的产品短片，用 Remotion 写成——画面全部由 React 组件逐帧绘制，配乐与音效由脚本合成，不依赖剪辑软件，也不依赖任何版权素材。
+
+<img src="assets/readme/promo.webp" alt="CrawlBear 54 秒宣传短片分镜" width="100%" />
+
+- 九幕：钩子 → 老办法 → 贴网址 → 翻找中 → 结果页 → 收进采集袋 → 专属解析 → 本机运行 → 落版；
+- 预览：`pnpm dev:promo`（Remotion Studio，可拖时间轴逐帧看）；
+- 出片：`pnpm render:promo` → `promos/crawl-bear-promo/out/crawl-bear-promo.mp4`；
+- 改文案 / 时长 / 配乐：见 [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md)；
+- 需要替换/升级小熊插画时，按 [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) 的清单用 gpt-image-2 生图，再跑 `pnpm --filter @crawl-bear/promo art`。
+
 ## 快速开始
 
 ### 环境要求
@@ -89,6 +104,7 @@ X、YouTube、Bilibili、抖音都已内置一键登录入口（「设置 → �
 - Rust 1.77+（rustup）与 Xcode Command Line Tools
 - 系统 `/usr/bin/curl`
 - 不再需要系统安装 ffmpeg；首次使用 YouTube/Bilibili 下载或 HLS 前，在应用内「设置 → 扩展管理」安装即可
+- 宣传短片（可选）：Remotion 会在首次渲染时自动下载 Chrome Headless Shell；重新合成配乐需要 `python3` + `numpy`
 
 ### 扩展管理
 
@@ -113,6 +129,9 @@ pnpm dev:desktop
 
 # 官网，http://localhost:5173
 pnpm dev:web
+
+# 宣传片 Remotion Studio，http://localhost:3000
+pnpm dev:promo
 ```
 
 ### 构建发布
@@ -124,8 +143,14 @@ pnpm build:desktop
 # 官网
 pnpm build:web
 
-# 两个包一起做前端构建
+# 宣传片 bundle（不渲染视频，只打包）
+pnpm build:promo
+
+# 三个包一起构建：桌面端 + 官网 + 宣传片 bundle
 pnpm build
+
+# 渲染宣传片 MP4（需要 Chrome，约 2–4 分钟）
+pnpm render:promo
 
 # 打可直接分发的 macOS 包（ad-hoc 签名 + 安装说明）
 pnpm package:macos
@@ -141,26 +166,6 @@ pnpm package:macos
 
 没有 Apple Developer 账号时，用户首次打开会触发 Gatekeeper。请把 [docs/INSTALL-macOS.md](docs/INSTALL-macOS.md) 一起发给对方，按里面的右键打开或终端命令处理；不要全局关闭 Gatekeeper。
 
-### 官网自动部署（腾讯云 COS）
-
-官网使用 `.github/workflows/website.yml`，在 `main` push / PR 时构建，并可在 `main` 上部署到腾讯云 COS。
-
-仓库 Settings → Secrets and variables → Actions 配置：
-
-- Variables：`COS_BUCKET`、`COS_REGION`、`COS_PREFIX`
-- Secrets：`COS_SECRET_ID`、`COS_SECRET_KEY`
-
-未配置 Variables 时只构建、不部署。`COS_PREFIX` 会同时作为 Vite `base` 使用，例如 `crawl-bear` 会生成 `/crawl-bear/` 的资源路径，并上传到 COS 的 `crawl-bear/` 目录。
-
-`COS_SECRET_ID` / `COS_SECRET_KEY` 可以配置在组织级；请确认该组织 Secret 的 Repository access 已包含本仓库。
-
-### GitHub Actions 发布流水线
-
-- `.github/workflows/ci.yml`：`main` push / PR 时构建两个前端包并跑 Rust 测试；
-- `.github/workflows/release.yml`：推送 `v*` tag 时自动构建 **universal（arm64 + x86_64）** macOS 应用，做 ad-hoc 签名，生成 `.pkg` / `.zip` / SHA256，并发布到 GitHub Release；
-- 也可手动 `workflow_dispatch` 只构建产物，不创建 Release；
-- 整个流程不需要 Apple 证书或私有 secret，签名仍是本地 ad-hoc。
-
 ### 图片与图标资产
 
 ```bash
@@ -169,6 +174,12 @@ python3 scripts/prepare_assets.py
 
 # 图标有改动时，重新生成 Tauri 图标
 pnpm --filter @crawl-bear/desktop exec tauri icon ../../design-assets/app-icon-rounded.png
+
+# 宣传片：把生成的 2K 插画处理成 WebP（清单见 promos/crawl-bear-promo/ASSETS.md）
+pnpm --filter @crawl-bear/promo art
+
+# 宣传片：重新合成配乐与音效（python3 + numpy，幂等）
+pnpm --filter @crawl-bear/promo audio
 ```
 
 ## 使用
@@ -198,24 +209,33 @@ pnpm --filter @crawl-bear/desktop exec tauri icon ../../design-assets/app-icon-r
 ## 工程结构
 
 ```text
-apps/
-  desktop/                        macOS 桌面应用
-    src/                          React UI（crawler / settings / shared）
+apps/                             应用（用户直接安装 / 访问）
+  desktop/                        macOS 桌面应用（Tauri 2 + Rust + React）
+    src/                          React UI（app / features / shared）
     src-tauri/                    Rust 后端、Tauri 配置与图标
     public/assets/                应用内 WebP（小熊插画、底纹、Logo）
   website/                        官网
     src/                          Vite + React 页面
     public/assets/                brand / shots / generated 图片
     ASSETS.md                     官网生图提示词
-assets/readme/                    README 配图
+promos/                           营销素材（不参与应用构建）
+  crawl-bear-promo/               54s 宣传短片（Remotion）
+    src/                          theme / lib / components / scenes / audio
+    public/assets/                brand / shots / generated 图片
+    public/audio/                 合成配乐与音效
+    scripts/                      make_audio.py / apply_art.py
+    BRIEF.md · ASSETS.md          制作规范 / 生图清单与提示词
+assets/readme/                    README 与文档配图
+design-assets/                    生图原稿（本地保留，不提交）
 scripts/prepare_assets.py         生图原稿 -> WebP / 圆角图标 / 官网同步
 docs/
+  STRUCTURE.md                    工程结构总览：包职责、依赖、资产流水线、改哪里
   design.md                       设计规范：品牌、色彩、字体、布局、动效
   assets.md                       生图资产清单与提示词
   ARCHITECTURE.md                 分层、数据流、扩展点
   API_CONTRACT.md                 前后端命令/事件/错误码契约
   media-extraction.md             通用媒体提取脚本与实测报告
-pnpm-workspace.yaml               workspace 配置
+pnpm-workspace.yaml               workspace 配置（apps/* + promos/*）
 ```
 
 > `design-assets/`、`docs/screenshots/`、`docs/archive/` 仅保留在本地，不随仓库提交；生图原稿可按 `docs/assets.md` 重新生成。
@@ -224,12 +244,15 @@ pnpm-workspace.yaml               workspace 配置
 
 | 文档 | 内容 |
 | --- | --- |
+| [docs/STRUCTURE.md](docs/STRUCTURE.md) | 工程结构总览：三个子包的职责、依赖约定、资产流水线、发布流程 |
 | [docs/design.md](docs/design.md) | 设计规范：手绘贴纸体系、排版、动效、文案与无障碍 |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Rust / React 分层、数据流、扩展点 |
 | [docs/API_CONTRACT.md](docs/API_CONTRACT.md) | Tauri 命令、事件与错误码 |
 | [docs/media-extraction.md](docs/media-extraction.md) | 通用媒体提取脚本与双内核实测 |
 | [docs/assets.md](docs/assets.md) | 小熊插画 / 底纹 / 图标的生图提示词 |
 | [apps/website/ASSETS.md](apps/website/ASSETS.md) | 官网首屏 / 预览区块 / 社交分享图提示词 |
+| [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md) | 宣传短片：预览、渲染、分镜、目录结构 |
+| [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) | 宣传短片可选 2K 插画 / 贴纸 / 纸纹清单与提示词 |
 
 ## 测试与验证
 
@@ -237,7 +260,7 @@ pnpm-workspace.yaml               workspace 配置
 # Rust 单元测试（URL、命名、分类、下载路径规划等）
 pnpm test:rust
 
-# 两个前端包的类型检查与构建
+# 三个包的类型检查与构建（含宣传片 bundle）
 pnpm build
 ```
 
@@ -247,39 +270,8 @@ pnpm build
 - 真实 WKWebView 实测百度首页：发现 79 张图片、6 个字体，`.js/.css` 等非媒体资源已被过滤；
 - 发布版 macOS 应用启动冒烟、内嵌资源与图标校验通过；
 - 首页、翻找中、结果页、预览弹窗、下载完成、设置页均逐屏截图校验（截图为本地验证产物，不随仓库提交）；
-- 官网与桌面应用均在 pnpm workspace 下完成生产构建。
-
-### YouTube 下载如何实现（不依赖外部下载器）
-
-YouTube 的网页播放器使用 SABR 流 + PO Token，页面本身不暴露直链，所以应用走的是自研提取链路：
-
-1. 在应用内请求 YouTube 页面，读取 innertube 配置与访客标识；
-2. 使用 **visionOS innertube 客户端**请求播放器接口，拿到普通视频轨与音频轨的直链；
-3. 通过 Rust + reqwest 下载最佳 H.264 视频轨和 AAC 音频轨，下载请求会读取 macOS 系统代理；
-4. 用应用内安装的 FFmpeg 扩展做无损封装（`-c copy`）合并为 MP4。
-
-全程不调用 `yt-dlp` 或其他外部下载器。解析器是插拔式的：后续新增站点只需要实现一个 resolver，下载、进度、代理、合流可以复用；某个解析方案失效时，也可以在注册表里加新的实现并让它优先命中。
-
-### Bilibili 下载如何实现
-
-Bilibili 播放器使用 DASH 流，直链由 `/x/player/wbi/playurl` 接口下发，并带 WBI 签名（`wts` + `w_rid`）：
-
-1. 从视频页解析 `BV`/`av` 号与分 P（`?p=`），用 view 接口拿标题、封面和每个分 P 的 cid；
-2. 用应用内 Cookie 请求 WBI 签名后的 playurl 接口；登录后可用清晰度与网页一致，未登录最高 480P；
-3. 选最高 1080P 的 H.264 视频轨与最佳 AAC 音频轨，交给共享下载器下载并用 FFmpeg 合并为 MP4。
-
-`b23.tv` 短链接会先跟随 302 跳转；多 P 视频在结果页会拆成多个视频条目，可分别勾选下载。
-
-### 抖音下载如何实现
-
-抖音桌面页把播放器放在签名请求后面，直接请求 HTML 往往只能看到“视频数据加载中”。应用会打开一个隐藏的 iPhone 尺寸 WebView，加载 `iesdouyin.com/share/video/<id>/` 分享页，等页面把作品信息写进 `window._ROUTER_DATA`：
-
-1. 从 `v.douyin.com` 短链或 `/video/`、`/note/` 链接解析作品 ID；
-2. 从移动端分享页读取标题、作者、时长、封面和播放地址；
-3. 视频作品把播放地址里的 `playwm` 换成 `play`，得到无水印 MP4 直链；图文作品逐张导出图片；
-4. 直链交给通用下载器，下载时再跟随 CDN 跳转。
-
-作品页上的按钮图标、UI 字体、追踪像素等资源会被过滤；作品本身和页面上的封面、头像、相关图片会保留在结果页。
+- 官网与桌面应用均在 pnpm workspace 下完成生产构建；
+- 宣传短片关键帧逐帧抽检、带音轨 MP4 试渲染通过，`promos/` 与 `apps/` 同在 pnpm workspace 下构建。
 
 ## 已知限制
 

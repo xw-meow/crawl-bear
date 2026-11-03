@@ -10,9 +10,12 @@
   "scripts": {
     "dev:desktop": "pnpm --filter @crawl-bear/desktop tauri dev",
     "dev:web": "pnpm --filter @crawl-bear/website dev",
+    "dev:promo": "pnpm --filter @crawl-bear/promo dev",
     "build": "pnpm -r build",
     "build:desktop": "pnpm --filter @crawl-bear/desktop exec tauri build --bundles app",
     "build:web": "pnpm --filter @crawl-bear/website build",
+    "build:promo": "pnpm --filter @crawl-bear/promo build",
+    "render:promo": "pnpm --filter @crawl-bear/promo render",
     "assets": "python3 scripts/prepare_assets.py",
     "test:rust": "cargo test --manifest-path apps/desktop/src-tauri/Cargo.toml --lib",
     "package:macos": "bash scripts/package_macos.sh"

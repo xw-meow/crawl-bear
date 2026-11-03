@@ -23,6 +23,10 @@ apps/desktop/src-tauri/icons/icon.png
 # ---- generated source art (regenerate from prompts in docs/assets.md) ----
 design-assets/
 
+# ---- python caches (asset / audio scripts) ----
+__pycache__/
+*.pyc
+
 # ---- local scratch & validation artifacts ----
 .tmp/
 .tmp-*/

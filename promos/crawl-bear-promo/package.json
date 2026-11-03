@@ -1,0 +1,32 @@
+{
+  "name": "@crawl-bear/promo",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "description": "CrawlBear 宣传短片 (marketing film) — Remotion 4 + React 18",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "studio": "remotion studio --no-open",
+    "build": "tsc --noEmit && remotion bundle src/index.ts --out-dir=dist",
+    "typecheck": "tsc --noEmit",
+    "still": "remotion still CrawlBearPromo",
+    "render": "remotion render CrawlBearPromo out/crawl-bear-promo.mp4",
+    "audio": "python3 scripts/make_audio.py",
+    "art": "python3 scripts/apply_art.py",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.484",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "4.0.484"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "5.9.3"
+  }
+}

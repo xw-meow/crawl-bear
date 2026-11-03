@@ -29,6 +29,9 @@ The repository is a **pnpm workspace**:
 | --- | --- |
 | `apps/desktop` | macOS desktop app (Tauri 2 + Rust + React) |
 | `apps/website` | Marketing site (Vite + React + TypeScript), deployed at [we.miework.cn/crawl-bear](https://we.miework.cn/crawl-bear/index.html) |
+| `promos/crawl-bear-promo` | Marketing film: 54s promo video (Remotion), see [Promo film](#promo-film) |
+
+The full repository map and package responsibilities live in [docs/STRUCTURE.md](docs/STRUCTURE.md) (Chinese).
 
 ## Features
 
@@ -80,6 +83,18 @@ Download folder, default types, concurrency, scrolling, item limit and login sit
 
 <img src="assets/readme/settings.webp" alt="Settings" width="100%" />
 
+## Promo film
+
+`promos/crawl-bear-promo` is the marketing sub-package: a **54s, 1920×1080 / 30fps** product film written in Remotion — every frame is a React component, the soundtrack is synthesized by a script, so there is no editor project and no licensed stock media involved.
+
+<img src="assets/readme/promo.webp" alt="CrawlBear 54s promo film storyboard" width="100%" />
+
+- Nine scenes: hook → the old way → paste a URL → crawling → results → into the bag → dedicated parsers → local-only → end card;
+- Preview: `pnpm dev:promo` (Remotion Studio, scrub the timeline frame by frame);
+- Export: `pnpm render:promo` → `promos/crawl-bear-promo/out/crawl-bear-promo.mp4`;
+- Text / duration / music edits: see [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md);
+- To upgrade the bear illustrations, generate them with the gpt-image-2 prompts in [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) and run `pnpm --filter @crawl-bear/promo art`.
+
 ## Quick start
 
 ### Requirements
@@ -89,6 +104,7 @@ Download folder, default types, concurrency, scrolling, item limit and login sit
 - Rust 1.77+ (rustup) and Xcode Command Line Tools
 - System `/usr/bin/curl`
 - No system ffmpeg required. Before the first YouTube/Bilibili or HLS download, install the in-app FFmpeg extension from **Settings → Extensions**.
+- Promo film (optional): Remotion downloads Chrome Headless Shell on the first render; re-synthesizing the soundtrack needs `python3` + `numpy`.
 
 ### Extension manager
 
@@ -113,6 +129,9 @@ pnpm dev:desktop
 
 # Website, http://localhost:5173
 pnpm dev:web
+
+# Promo film — Remotion Studio, http://localhost:3000
+pnpm dev:promo
 ```
 
 ### Build and release
@@ -124,8 +143,14 @@ pnpm build:desktop
 # Website
 pnpm build:web
 
-# Build both frontends
+# Promo film bundle (bundle only, no render)
+pnpm build:promo
+
+# Build all three packages: both frontends + promo bundle
 pnpm build
+
+# Render the promo film to MP4 (needs Chrome, 2–4 min)
+pnpm render:promo
 
 # Build a distributable macOS package (ad-hoc signed + install guide)
 pnpm package:macos
@@ -140,26 +165,6 @@ Desktop bundle: `apps/desktop/src-tauri/target/release/bundle/macos/CrawlBear.ap
 
 Without an Apple Developer account, first launch is blocked by Gatekeeper. Send [docs/INSTALL-macOS.md](docs/INSTALL-macOS.md) along with the package and follow the right-click / Terminal steps there. Do not disable Gatekeeper globally.
 
-### Website deployment (Tencent Cloud COS)
-
-`.github/workflows/website.yml` builds the website on `main` pushes / PRs and can deploy it to Tencent Cloud COS on `main`.
-
-Configure under **Settings → Secrets and variables → Actions**:
-
-- Variables: `COS_BUCKET`, `COS_REGION`, `COS_PREFIX`
-- Secrets: `COS_SECRET_ID`, `COS_SECRET_KEY`
-
-Without the variables, the workflow only builds and skips deployment. `COS_PREFIX` is also used as Vite’s `base`: e.g. `crawl-bear` produces `/crawl-bear/` asset URLs and uploads to the `crawl-bear/` directory in COS.
-
-`COS_SECRET_ID` / `COS_SECRET_KEY` may be organization-level secrets; make sure this repository is included in the secret’s Repository access list.
-
-### GitHub Actions release pipeline
-
-- `.github/workflows/ci.yml`: builds both frontend packages and runs Rust tests on `main` pushes / PRs.
-- `.github/workflows/release.yml`: on a `v*` tag, builds a **universal (arm64 + x86_64)** macOS app, ad-hoc signs it, produces `.pkg` / `.zip` / SHA256 and publishes them to GitHub Releases.
-- Manual `workflow_dispatch` builds the artifacts without creating a Release.
-- No Apple certificate or private secret is required; signing remains local ad-hoc.
-
 ### Image and icon assets
 
 ```bash
@@ -168,6 +173,12 @@ python3 scripts/prepare_assets.py
 
 # Regenerate Tauri icons after changing the icon source
 pnpm --filter @crawl-bear/desktop exec tauri icon ../../design-assets/app-icon-rounded.png
+
+# Promo film: turn generated 2K art into WebP (prompt list in promos/crawl-bear-promo/ASSETS.md)
+pnpm --filter @crawl-bear/promo art
+
+# Promo film: re-synthesize music and SFX (python3 + numpy, idempotent)
+pnpm --filter @crawl-bear/promo audio
 ```
 
 ## Usage
@@ -197,24 +208,33 @@ Add a site URL in **Settings → Login sites**, click “Open login” and sign 
 ## Project structure
 
 ```text
-apps/
-  desktop/                        macOS desktop app
-    src/                          React UI (crawler / settings / shared)
+apps/                             Applications (installed / visited by users)
+  desktop/                        macOS desktop app (Tauri 2 + Rust + React)
+    src/                          React UI (app / features / shared)
     src-tauri/                    Rust backend, Tauri config and icons
     public/assets/                In-app WebP art (bear, paper, logo)
   website/                        Marketing site
     src/                          Vite + React pages
     public/assets/                brand / shots / generated images
     ASSETS.md                     Website image prompts
-assets/readme/                    README images
+promos/                           Marketing assets (not part of the app build)
+  crawl-bear-promo/               54s promo film (Remotion)
+    src/                          theme / lib / components / scenes / audio
+    public/assets/                brand / shots / generated images
+    public/audio/                 Synthesized soundtrack and SFX
+    scripts/                      make_audio.py / apply_art.py
+    BRIEF.md · ASSETS.md          Production guide / image prompts
+assets/readme/                    README and doc images
+design-assets/                    Generated art originals (local, not committed)
 scripts/prepare_assets.py         Generated art -> WebP / icons / website sync
 docs/
+  STRUCTURE.md                    Repository map: packages, deps, asset pipelines, where to change what
   design.md                       Design system: brand, color, type, layout, motion
   assets.md                       Image asset checklist and prompts
   ARCHITECTURE.md                 Layers, data flow, extension points
   API_CONTRACT.md                 Commands / events / error codes
   media-extraction.md             Generic extraction script and test report
-pnpm-workspace.yaml               Workspace config
+pnpm-workspace.yaml               Workspace config (apps/* + promos/*)
 ```
 
 > `design-assets/`, `docs/screenshots/` and `docs/archive/` stay local and are not committed. Original generated art can be recreated from prompts in `docs/assets.md`.
@@ -223,12 +243,15 @@ pnpm-workspace.yaml               Workspace config
 
 | Document | Contents |
 | --- | --- |
+| [docs/STRUCTURE.md](docs/STRUCTURE.md) | Repository map: package responsibilities, dependency rules, asset pipelines, release flow (Chinese) |
 | [docs/design.md](docs/design.md) | Design system: hand-drawn sticker style, typography, motion, copy, accessibility |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Rust / React layers, data flow, extension points |
 | [docs/API_CONTRACT.md](docs/API_CONTRACT.md) | Tauri commands, events and error codes |
 | [docs/media-extraction.md](docs/media-extraction.md) | Generic extraction script and dual-engine test report |
 | [docs/assets.md](docs/assets.md) | Image prompts for bear art, paper and icons |
 | [apps/website/ASSETS.md](apps/website/ASSETS.md) | Website hero / preview / social image prompts |
+| [promos/crawl-bear-promo/README.md](promos/crawl-bear-promo/README.md) | Promo film: preview, render, storyboard, structure |
+| [promos/crawl-bear-promo/ASSETS.md](promos/crawl-bear-promo/ASSETS.md) | Optional 2K bear / sticker / paper texture prompts for the film |
 
 ## Testing and verification
 
@@ -236,7 +259,7 @@ pnpm-workspace.yaml               Workspace config
 # Rust unit tests (URL, naming, classification, download paths)
 pnpm test:rust
 
-# Type-check and build both frontend packages
+# Type-check and build all three packages (including the promo bundle)
 pnpm build
 ```
 
@@ -246,39 +269,8 @@ Completed verification:
 - real WKWebView crawl of the Baidu homepage: 79 images and 6 fonts found; `.js` / `.css` and other non-media resources filtered out;
 - release macOS app smoke test, embedded assets and icon checks pass;
 - home, crawling, results, preview modal, download-complete and settings screens were checked screen by screen (screenshots are local validation artifacts and are not committed);
-- both the website and desktop app build in production mode under the pnpm workspace.
-
-### How YouTube downloads work (no external downloader)
-
-YouTube’s web player uses SABR streams + PO tokens, so the page no longer exposes direct media URLs. CrawlBear uses its own extraction pipeline:
-
-1. Request the YouTube page from inside the app and read the innertube config and visitor ID.
-2. Query the player endpoint with the **visionOS innertube client** to obtain ordinary video and audio URLs.
-3. Download the best H.264 video track and AAC audio track with Rust + reqwest; requests honour the macOS system proxy.
-4. Mux them losslessly (`-c copy`) into MP4 with the in-app FFmpeg extension.
-
-No `yt-dlp` or other external extractor is involved. Resolvers are pluggable: adding a new site only requires implementing a resolver; download, progress, proxy and muxing are shared. If one extraction approach stops working, a new resolver can be added at the front of the registry as a drop-in replacement.
-
-### How Bilibili downloads work
-
-Bilibili's player uses DASH. Direct stream URLs come from `/x/player/wbi/playurl` with a WBI signature (`wts` + `w_rid`):
-
-1. Parse the `BV`/`av` id and part (`?p=`) from the page, then call the view API for the title, cover and each part's cid.
-2. Request the WBI-signed playurl endpoint with the app's cookies. Signed-in users get the same quality as the website; anonymous downloads top out at 480P.
-3. Pick the best H.264 track up to 1080P and the best AAC track, then hand them to the shared downloader and mux them into MP4 with FFmpeg.
-
-`b23.tv` short links are followed through their redirect. Multi-part videos become one video entry per part on the results page, so parts can be selected individually.
-
-### How Douyin downloads work
-
-Douyin's desktop page loads the player through signed requests, so a plain HTML fetch often only sees “video data loading”. CrawlBear opens a hidden iPhone-sized WebView on the `iesdouyin.com/share/video/<id>/` share page and waits for the post to appear in `window._ROUTER_DATA`:
-
-1. Parse the post id from a `v.douyin.com` short link or a `/video/`, `/note/` URL.
-2. Read the title, author, duration, cover and play URL from the mobile share page.
-3. For videos, change `playwm` to `play` in the play URL to get a watermark-free MP4; for image posts, collect every image.
-4. Hand the direct URLs to the shared downloader, which follows the CDN redirect at download time.
-
-UI assets such as button icons, UI fonts and tracking pixels are filtered out, while the post, covers, avatars and images on the page are kept in the results.
+- both the website and desktop app build in production mode under the pnpm workspace;
+- the promo film was checked frame by frame at key beats and test-rendered to MP4 with its audio track; `promos/` builds under the same pnpm workspace as `apps/`.
 
 ## Known limitations
 
